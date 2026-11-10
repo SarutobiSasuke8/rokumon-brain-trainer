@@ -1,21 +1,21 @@
 {
   "slug": "rokumon-brain-trainer",
   "title": "Rokumon Brain Trainer",
-  "tagline": "Sequence memory in under a minute.",
-  "description": "Watch a growing sequence of cells and repeat it. Short sessions, personal bests, and platform scores.",
-  "status": "prototype",
+  "tagline": "Sequence, reaction and pattern drills.",
+  "description": "Three short cognitive modes: sequence memory, reaction time and odd-one-out pattern. Personal bests stored locally, scores and events reported to the hub.",
+  "status": "alpha",
   "visibility": "unlisted",
   "featured": false,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "releasedAt": null,
   "updatedAt": "2026-11-10",
   "delivery": {
     "mode": "embedded",
-    "release": "0.1.0",
+    "release": "0.2.0",
     "budget": { "maxBundleBytes": 1048576, "maxFiles": 8 }
   },
   "genres": ["Puzzle", "Brain"],
-  "tags": ["memory", "sequence", "short-session", "mobile", "single-player"],
+  "tags": ["memory", "sequence", "reaction", "pattern", "short-session", "mobile", "single-player"],
   "controls": ["mouse", "touch"],
   "players": { "min": 1, "max": 1 },
   "support": { "desktop": "full", "mobile": "full" },
@@ -44,12 +44,10 @@
     "enabled": true,
     "capabilities": ["score", "event"],
     "events": [
-      {
-        "name": "sequence-completed",
-        "properties": {
-          "level": "number"
-        }
-      }
+      { "name": "sequence-completed", "properties": { "level": "number" } },
+      { "name": "reaction-completed", "properties": { "ms": "number" } },
+      { "name": "reaction-best", "properties": { "ms": "number" } },
+      { "name": "pattern-correct", "properties": { "round": "number" } }
     ]
   },
   "source": {
