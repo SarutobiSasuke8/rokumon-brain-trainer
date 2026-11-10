@@ -1,0 +1,62 @@
+{
+  "slug": "rokumon-brain-trainer",
+  "title": "Rokumon Brain Trainer",
+  "tagline": "Sequence memory in under a minute.",
+  "description": "Watch a growing sequence of cells and repeat it. Short sessions, personal bests, and platform scores.",
+  "status": "prototype",
+  "visibility": "unlisted",
+  "featured": false,
+  "version": "0.1.0",
+  "releasedAt": null,
+  "updatedAt": "2026-11-10",
+  "delivery": {
+    "mode": "embedded",
+    "release": "0.1.0",
+    "budget": { "maxBundleBytes": 1048576, "maxFiles": 8 }
+  },
+  "genres": ["Puzzle", "Brain"],
+  "tags": ["memory", "sequence", "short-session", "mobile", "single-player"],
+  "controls": ["mouse", "touch"],
+  "players": { "min": 1, "max": 1 },
+  "support": { "desktop": "full", "mobile": "full" },
+  "media": {
+    "cover": null,
+    "hero": null,
+    "logo": null,
+    "screenshots": []
+  },
+  "theme": { "accent": "#58a6ff", "background": "#0f1419" },
+  "credits": {
+    "developer": "Rokumon Games",
+    "art": null,
+    "audio": null
+  },
+  "runtime": {
+    "kind": "iframe",
+    "entry": "/games/rokumon-brain-trainer/index.html",
+    "trust": "first-party",
+    "orientation": "any",
+    "allowFullscreen": true,
+    "pointerLock": false
+  },
+  "bridge": {
+    "version": 1,
+    "enabled": true,
+    "capabilities": ["score", "event"],
+    "events": [
+      {
+        "name": "sequence-completed",
+        "properties": {
+          "level": "number"
+        }
+      }
+    ]
+  },
+  "source": {
+    "repo": "https://github.com/SarutobiSasuke8/rokumon-brain-trainer",
+    "localPath": null,
+    "bundlePath": null,
+    "bundleIncludes": null,
+    "buildCommand": null
+  }
+}
