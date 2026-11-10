@@ -2,250 +2,1313 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080b10">
+  <meta name="description" content="Sequence, reaction and pattern drills. Short sessions, bests saved on this device.">
   <title>Rokumon Brain Trainer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080b10'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23f0c15a'/%3E%3Ccircle cx='16' cy='6.2' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='24.5' cy='11.1' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='24.5' cy='20.9' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='16' cy='25.8' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='7.5' cy='20.9' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='7.5' cy='11.1' r='2' fill='%23f0c15a'/%3E%3C/svg%3E">
   <style>
-    :root { --bg:#0f1419; --fg:#e6edf3; --accent:#58a6ff; --good:#3fb950; --bad:#f85149; --card:#161b22; --border:#30363d; }
+    :root {
+      --bg: #080b10;
+      --bg-2: #10151d;
+      --surface: #141b26;
+      --line: #2c384c;
+      --line-strong: #3d4e68;
+      --fg: #e7eef8;
+      --muted: #a9b6c8;
+      --faint: #7e8da3;
+      --gold: #f0c15a;
+      --gold-deep: #c8902e;
+      --ink: #1a1408;
+      --good: #3dd68c;
+      --bad: #ff5d6c;
+      --wait: #9d2e36;
+      --go: #b6f3df;
+      --go-ink: #06281f;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+      --pad: 16px;
+    }
+
     * { box-sizing: border-box; }
-    body { margin:0; background:var(--bg); color:var(--fg); font-family:system-ui,sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:1rem; }
-    h1 { margin:0.5rem 0; font-size:1.6rem; }
-    .menu { display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center; margin:1rem 0; }
-    .mode-btn, button { padding:0.7rem 1.2rem; border:0; border-radius:8px; background:var(--accent); color:#0f1419; font-weight:600; cursor:pointer; font-size:1rem; }
-    .mode-btn.active { outline:2px solid #fff; }
-    button.secondary { background:#30363d; color:var(--fg); }
-    button:disabled { opacity:0.5; cursor:not-allowed; }
-    .screen { width:100%; max-width:420px; display:none; flex-direction:column; align-items:center; }
-    .screen.active { display:flex; }
-    .board { display:grid; grid-template-columns:repeat(3,90px); gap:10px; margin:1rem 0; }
-    .cell { width:90px; height:90px; border-radius:14px; background:#21262d; border:2px solid var(--border); cursor:pointer; transition:background .12s, transform .1s; }
-    .cell.active { background:var(--accent); transform:scale(0.95); }
-    .cell.correct { background:var(--good); }
-    .cell.wrong { background:var(--bad); }
-    .stats, .info { margin:0.5rem 0; text-align:center; opacity:0.9; }
-    .big { font-size:2.5rem; font-weight:700; margin:1rem 0; }
-    .reaction-area { width:280px; height:180px; border-radius:16px; background:#21262d; display:flex; align-items:center; justify-content:center; font-size:1.2rem; cursor:pointer; margin:1rem 0; border:2px solid var(--border); transition:background .1s; }
-    .reaction-area.wait { background:#f85149; }
-    .reaction-area.go { background:var(--good); }
-    .pattern { display:grid; grid-template-columns:repeat(4,70px); gap:8px; margin:1rem 0; }
-    .p-cell { width:70px; height:70px; border-radius:10px; background:#21262d; border:2px solid var(--border); cursor:pointer; transition:transform .1s; }
-    .p-cell.odd { background:#58a6ff; }
-    .footer { margin-top:1.5rem; }
+    [hidden] { display: none !important; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    body {
+      min-height: 100dvh;
+      background:
+        radial-gradient(900px 520px at 50% -10%, rgba(240, 193, 90, 0.16), transparent 58%),
+        radial-gradient(700px 480px at 110% 110%, rgba(94, 224, 196, 0.08), transparent 46%),
+        var(--bg);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='64' viewBox='0 0 72 64'%3E%3Cpath d='M36 2 L68 20 V44 L36 62 L4 44 V20 Z' fill='none' stroke='%23f0c15a' stroke-opacity='0.09' stroke-width='1'/%3E%3C/svg%3E");
+      opacity: 0.9;
+    }
+
+    button { font: inherit; color: inherit; cursor: pointer; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(480px, 100%);
+      margin: 0 auto;
+      min-height: 100dvh;
+      padding:
+        calc(18px + env(safe-area-inset-top))
+        var(--pad)
+        calc(32px + env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .mark { width: 42px; height: 42px; flex: none; }
+    .kicker {
+      margin: 0;
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+    }
+
+    .icon-btn, .text-btn, .btn, .card-help, .card-main {
+      border: 1px solid transparent;
+      background: transparent;
+      transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease, filter 150ms ease, color 150ms ease;
+    }
+    .icon-btn:active, .btn:active, .card-main:active, .text-btn:active, .card-help:active { transform: scale(0.96); }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border-color: var(--line);
+      background: rgba(20, 27, 38, 0.8);
+      display: grid;
+      place-items: center;
+      flex: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+    .icon-btn:hover { border-color: var(--gold); }
+    .icon-btn svg { width: 20px; height: 20px; display: block; }
+    .icon-btn .when-on, .icon-btn[aria-pressed="true"] .when-off { display: none; }
+    .icon-btn[aria-pressed="true"] .when-on { display: block; }
+
+    .lede { margin: 0; color: var(--muted); max-width: 38ch; }
+
+    .view { display: none; }
+    .view.on {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: rise 280ms ease;
+    }
+
+    .cards { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%),
+        var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-main {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) 72px;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      padding: 14px 14px 8px;
+      min-height: 108px;
+      border: 0;
+    }
+    .card-main:hover { background: rgba(240, 193, 90, 0.05); }
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(240, 193, 90, 0.1);
+      border: 1px solid rgba(240, 193, 90, 0.28);
+    }
+    .card-icon svg { width: 26px; height: 26px; display: block; }
+    .card-name { display: block; font-weight: 700; letter-spacing: -0.02em; font-size: 1.05rem; }
+    .card-desc { display: block; color: var(--muted); font-size: 0.86rem; margin-top: 2px; }
+    .card-best {
+      display: block;
+      margin-top: 6px;
+      color: var(--gold);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-variant-numeric: tabular-nums;
+    }
+    .card-help {
+      width: 100%;
+      min-height: 44px;
+      border: 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      text-align: left;
+      padding: 0 14px;
+      font-size: 0.86rem;
+    }
+    .card-help:hover { color: var(--gold); }
+
+    .mini {
+      width: 72px;
+      height: 72px;
+      border-radius: 12px;
+      background: #101722;
+      border: 1px solid var(--line);
+      display: grid;
+      padding: 6px;
+      gap: 3px;
+    }
+    .seq-mini { grid-template-columns: repeat(3, 1fr); }
+    .pat-mini { grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 6px; }
+    .mini i {
+      display: block;
+      border-radius: 3px;
+      background: #243044;
+    }
+    .seq-mini i:nth-child(1) { animation: miniLit 1.8s infinite; }
+    .seq-mini i:nth-child(5) { animation: miniLit 1.8s infinite 0.22s; }
+    .seq-mini i:nth-child(9) { animation: miniLit 1.8s infinite 0.44s; }
+    .seq-mini i:nth-child(6) { animation: miniLit 1.8s infinite 0.66s; }
+    .pat-mini i:nth-child(10) { background: #5ee0c4; }
+    .react-mini {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: reactPreview 2.2s infinite;
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .text-btn {
+      align-self: center;
+      min-height: 44px;
+      padding: 0 12px;
+      color: var(--faint);
+      border: 0;
+      background: transparent;
+    }
+    .text-btn:hover { color: var(--fg); }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toolbar-title { flex: 1; min-width: 0; }
+    .toolbar-title strong {
+      display: block;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+    }
+
+    .hud {
+      width: min(100%, 380px);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.92rem;
+    }
+    .hud b { color: var(--fg); font-weight: 700; }
+
+    .status {
+      margin: 0;
+      text-align: center;
+      min-height: 1.45em;
+      color: var(--muted);
+    }
+
+    .panel { display: none; width: 100%; flex-direction: column; align-items: center; gap: 12px; }
+    .panel.on { display: flex; }
+
+    .stage { position: relative; width: min(100%, 380px); }
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 22px;
+      background: #10151d;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease;
+    }
+    .app.is-frozen .stage::after { opacity: 1; }
+
+    .board, .pboard {
+      display: grid;
+      width: 100%;
+      gap: 10px;
+    }
+    .board { grid-template-columns: repeat(3, 1fr); }
+    .pboard { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+    .cell, .pcell, .arena {
+      border: 1px solid var(--line-strong);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 46%),
+        #1a2333;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 18px rgba(0, 0, 0, 0.28);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cell, .pcell {
+      aspect-ratio: 1;
+      width: 100%;
+      border-radius: 18px;
+      padding: 0;
+    }
+    .cell:hover, .pcell:hover, .arena:hover { border-color: var(--gold); }
+    .cell:active, .pcell:active { transform: scale(0.96); }
+    .board.locked .cell { pointer-events: none; }
+
+    .cell.lit {
+      background: linear-gradient(180deg, #ffe7a8, #e2ae3a);
+      border-color: #ffe7a8;
+      box-shadow: 0 0 0 3px rgba(240, 193, 90, 0.28), 0 0 24px rgba(240, 193, 90, 0.45);
+    }
+    .cell.good, .pcell.good {
+      box-shadow: 0 0 0 3px rgba(61, 214, 140, 0.95), 0 0 18px rgba(61, 214, 140, 0.35);
+      animation: pop 220ms ease;
+    }
+    .cell.bad, .pcell.bad, .arena.is-early {
+      box-shadow: 0 0 0 3px var(--bad);
+      animation: shake 280ms ease;
+    }
+    .pcell.reveal {
+      box-shadow: 0 0 0 3px var(--gold), 0 0 18px rgba(240, 193, 90, 0.5);
+    }
+
+    .arena {
+      width: 100%;
+      min-height: 230px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      transition: background-color 70ms linear, color 70ms linear, transform 150ms ease;
+    }
+    .arena:active { transform: scale(0.96); }
+    .arena.is-wait {
+      background: var(--wait);
+      color: #fff;
+      border-color: #c44b53;
+      animation: waitBreath 1.4s ease-in-out infinite;
+    }
+    .arena.is-go {
+      background: var(--go);
+      color: var(--go-ink);
+      border-color: #e7fff6;
+      animation: goPulse 160ms ease;
+    }
+    .readout {
+      margin: 0;
+      font-size: clamp(2.4rem, 12vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      min-height: 1em;
+    }
+    .readout span { font-size: 0.4em; letter-spacing: 0; margin-left: 4px; color: var(--muted); font-weight: 700; }
+    .meta { margin: 0; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+
+    .result {
+      width: min(100%, 380px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+    }
+    .result p { margin: 0; color: var(--muted); }
+
+    .btn {
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      background: var(--gold);
+      color: var(--ink);
+      font-weight: 700;
+      border: 1px solid #ffe1a0;
+      box-shadow: 0 8px 20px rgba(240, 193, 90, 0.18);
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .btn.ghost {
+      background: transparent;
+      color: var(--fg);
+      border-color: var(--line-strong);
+      box-shadow: none;
+    }
+
+    .sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: rgba(5, 7, 10, 0.72);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+    .sheet-card {
+      width: min(440px, 100%);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px 20px 16px;
+      box-shadow: var(--shadow);
+      animation: rise 220ms ease;
+    }
+    .sheet-card h2 { margin: 0 0 8px; letter-spacing: -0.03em; font-size: 1.3rem; }
+    .sheet-card p { margin: 0 0 10px; color: var(--muted); }
+    .sheet-card ul { margin: 0 0 16px; padding-left: 1.1rem; color: var(--fg); }
+    .sheet-card li { margin: 6px 0; }
+    .sheet-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+    .sheet-actions .btn { min-width: 120px; }
+
+    @media (min-width: 800px) {
+      body { display: grid; place-items: center; }
+      .app {
+        width: min(460px, calc(100vw - 48px));
+        min-height: min(780px, calc(100dvh - 48px));
+        max-height: calc(100dvh - 48px);
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: rgba(16, 21, 29, 0.92);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+      .sheet { align-items: center; }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      45% { transform: scale(0.96); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(2px); }
+    }
+    @keyframes goPulse {
+      0% { filter: brightness(1.25); }
+      100% { filter: brightness(1); }
+    }
+    @keyframes waitBreath {
+      0%, 100% { box-shadow: inset 0 0 0 0 rgba(255, 255, 255, 0); }
+      50% { box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.05); }
+    }
+    @keyframes miniLit {
+      0%, 58%, 100% { background: #243044; }
+      10%, 36% { background: #f0c15a; }
+    }
+    @keyframes reactPreview {
+      0%, 45% { background: #9d2e36; color: #fff; }
+      55%, 100% { background: #b6f3df; color: #06281f; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Rokumon Brain Trainer</h1>
-  <div class="menu">
-    <button class="mode-btn active" data-mode="sequence">Sequence</button>
-    <button class="mode-btn" data-mode="reaction">Reaction</button>
-    <button class="mode-btn" data-mode="pattern">Pattern</button>
-  </div>
-  <div id="stats" class="stats">Best Sequence: 0 | Best Reaction: — | Pattern Best: 0</div>
+  <div class="app" id="app">
+    <header class="top">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 42 42" aria-hidden="true">
+          <rect width="42" height="42" rx="14" fill="#141b26" stroke="#3d4e68"/>
+          <circle cx="21" cy="21" r="3.2" fill="#f0c15a"/>
+          <circle cx="21" cy="8.2" r="2.15" fill="#f0c15a"/>
+          <circle cx="32.1" cy="14.5" r="2.15" fill="#f0c15a"/>
+          <circle cx="32.1" cy="27.5" r="2.15" fill="#f0c15a"/>
+          <circle cx="21" cy="33.8" r="2.15" fill="#f0c15a"/>
+          <circle cx="9.9" cy="27.5" r="2.15" fill="#f0c15a"/>
+          <circle cx="9.9" cy="14.5" r="2.15" fill="#f0c15a"/>
+        </svg>
+        <div>
+          <p class="kicker">Rokumon</p>
+          <h1>Brain Trainer</h1>
+        </div>
+      </div>
+      <button type="button" class="icon-btn" id="mute-btn" aria-pressed="false" aria-label="Mute sound">
+        <svg class="when-off" viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 10v4h3l4 3V7L7 10H4z"/><path d="M16 9.5a3.5 3.5 0 010 5"/><path d="M18.2 7.2a6.5 6.5 0 010 9.6"/>
+        </svg>
+        <svg class="when-on" viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 10v4h3l4 3V7L7 10H4z"/><path d="M16 10l4 4M20 10l-4 4"/>
+        </svg>
+      </button>
+    </header>
 
-  <div id="seq-screen" class="screen active">
-    <div class="info">Watch the sequence, then repeat it</div>
-    <div class="score" id="seq-score">Level 1</div>
-    <div class="board" id="seq-board"></div>
-    <button id="seq-start">Start Sequence</button>
+    <section id="view-menu" class="view on">
+      <p class="lede">Three short drills for memory, speed and attention. Bests stay on this device.</p>
+      <div class="cards">
+        <article class="card">
+          <button type="button" class="card-main" data-start="sequence">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none">
+                <rect x="4" y="4" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/>
+                <rect x="12.75" y="4" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
+                <rect x="21.5" y="4" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
+                <rect x="4" y="12.75" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
+                <rect x="12.75" y="12.75" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/>
+                <rect x="21.5" y="12.75" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
+                <rect x="4" y="21.5" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
+                <rect x="12.75" y="21.5" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
+                <rect x="21.5" y="21.5" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/>
+              </svg>
+            </span>
+            <span class="card-copy">
+              <span class="card-name">Sequence</span>
+              <span class="card-desc">Watch a growing path of pads, then repeat it.</span>
+              <span class="card-best" id="best-sequence">Best —</span>
+            </span>
+            <span class="mini seq-mini" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          </button>
+          <button type="button" class="card-help" data-help="sequence">How to play</button>
+        </article>
+
+        <article class="card">
+          <button type="button" class="card-main" data-start="reaction">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none">
+                <path d="M18 3.5 8.5 18h7.2L13 28.5 24.5 13H16.8L18 3.5z" fill="#f0c15a"/>
+              </svg>
+            </span>
+            <span class="card-copy">
+              <span class="card-name">Reaction</span>
+              <span class="card-desc">Wait for the signal, then tap as fast as you can.</span>
+              <span class="card-best" id="best-reaction">Best —</span>
+            </span>
+            <span class="mini react-mini" aria-hidden="true">TAP</span>
+          </button>
+          <button type="button" class="card-help" data-help="reaction">How to play</button>
+        </article>
+
+        <article class="card">
+          <button type="button" class="card-main" data-start="pattern">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none">
+                <rect x="4" y="4" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/>
+                <rect x="18" y="4" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/>
+                <rect x="4" y="18" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/>
+                <rect x="18" y="18" width="10" height="10" rx="2" fill="#5ee0c4"/>
+              </svg>
+            </span>
+            <span class="card-copy">
+              <span class="card-name">Pattern</span>
+              <span class="card-desc">Find the one tile whose colour does not match.</span>
+              <span class="card-best" id="best-pattern">Best —</span>
+            </span>
+            <span class="mini pat-mini" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          </button>
+          <button type="button" class="card-help" data-help="pattern">How to play</button>
+        </article>
+      </div>
+      <button type="button" class="text-btn" id="reset-btn">Reset all bests</button>
+    </section>
+
+    <section id="view-play" class="view">
+      <div class="toolbar">
+        <button type="button" class="icon-btn" id="back-btn" aria-label="Back to menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 5 8 12l7 7"/>
+          </svg>
+        </button>
+        <div class="toolbar-title">
+          <p class="kicker" id="play-kicker">Memory</p>
+          <strong id="play-title">Sequence</strong>
+        </div>
+        <button type="button" class="icon-btn" id="help-btn" aria-label="How to play">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"/><path d="M12 16v.5M12 8.5a2 2 0 00-2 2V11h2.2c.6 0 1.3.4 1.3 1.2S12.7 13.5 12 13.5"/>
+          </svg>
+        </button>
+        <button type="button" class="icon-btn" id="pause-btn" aria-label="Pause">
+          <svg viewBox="0 0 24 24" fill="#e7eef8" aria-hidden="true">
+            <rect x="7" y="6" width="3.2" height="12" rx="1"/><rect x="13.8" y="6" width="3.2" height="12" rx="1"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="panel-sequence" class="panel">
+        <p class="status" id="seq-status" aria-live="polite">Watch the path, then repeat it.</p>
+        <div class="hud"><span>Level <b id="seq-level">1</b></span><span>Best <b id="seq-best">—</b></span></div>
+        <div class="stage"><div class="board locked" id="seq-board"></div></div>
+        <div class="result" id="seq-result" hidden>
+          <p id="seq-result-copy"></p>
+          <button type="button" class="btn" id="seq-retry">Try again</button>
+        </div>
+      </div>
+
+      <div id="panel-reaction" class="panel">
+        <p class="status" id="react-status" aria-live="polite">Tap the panel to arm the round.</p>
+        <p class="readout" id="react-readout">Ready</p>
+        <div class="stage"><button type="button" class="arena" id="react-area">Tap to start</button></div>
+        <p class="meta" id="react-meta">Best — · Avg —</p>
+      </div>
+
+      <div id="panel-pattern" class="panel">
+        <p class="status" id="pat-status" aria-live="polite">Tap the tile that does not match.</p>
+        <div class="hud"><span>Round <b id="pat-level">1</b></span><span>Best <b id="pat-best">—</b></span></div>
+        <div class="stage"><div class="pboard" id="pat-board"></div></div>
+        <div class="result" id="pat-result" hidden>
+          <p id="pat-result-copy"></p>
+          <button type="button" class="btn" id="pat-retry">Try again</button>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <div id="react-screen" class="screen">
-    <div class="info">Wait for green, then tap as fast as you can</div>
-    <div class="big" id="react-time">Ready</div>
-    <div class="reaction-area" id="react-area">Tap to start</div>
-    <div class="info" id="react-best">Best: — ms &nbsp;|&nbsp; Avg (last 5): —</div>
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <h2 id="sheet-title">How to play</h2>
+      <div id="sheet-body"></div>
+      <div class="sheet-actions">
+        <button type="button" class="btn ghost" id="sheet-secondary">Close</button>
+        <button type="button" class="btn" id="sheet-primary">Play</button>
+      </div>
+    </div>
   </div>
-
-  <div id="pat-screen" class="screen">
-    <div class="info">Find the different colour</div>
-    <div class="score" id="pat-score">Round 1</div>
-    <div class="pattern" id="pat-board"></div>
-    <button id="pat-start">Start Pattern</button>
-  </div>
-
-  <div class="footer"><button class="secondary" id="reset-stats">Reset all bests</button></div>
 
   <script>
-    const hubCall = (method, ...args) => { try { const s = window.Hub; if (typeof s?.[method] === 'function') s[method](...args); } catch {} };
+    (() => {
+      const hubCall = (method, ...args) => {
+        try {
+          const hub = window.Hub;
+          if (typeof hub?.[method] === "function") {
+            hub[method](...args);
+            return true;
+          }
+        } catch (err) { /* host bridge must not break play */ }
+        return false;
+      };
 
-    // Simple audio
-    let audioCtx;
-    function tone(freq, dur=0.12, type='sine') {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.type = type; o.frequency.value = freq;
-        g.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(); o.stop(audioCtx.currentTime + dur);
-      } catch {}
-    }
+      let bootReady = false;
+      const signalBootReady = () => {
+        if (bootReady) return;
+        if (hubCall("ready")) bootReady = true;
+      };
+      signalBootReady();
+      window.addEventListener("load", signalBootReady);
+      const bootTimer = setInterval(() => {
+        signalBootReady();
+        if (bootReady) clearInterval(bootTimer);
+      }, 150);
+      setTimeout(() => clearInterval(bootTimer), 3000);
 
-    // Stats
-    let stats = JSON.parse(localStorage.getItem('rbt-stats') || '{"seq":0,"react":null,"pat":0,"reacts":[]}');
-    function saveStats() { localStorage.setItem('rbt-stats', JSON.stringify(stats)); updateStatsDisplay(); }
-    function updateStatsDisplay() {
-      const avg = stats.reacts && stats.reacts.length ? Math.round(stats.reacts.reduce((a,b)=>a+b,0)/stats.reacts.length) : null;
-      document.getElementById('stats').textContent = `Best Sequence: ${stats.seq} | Best Reaction: ${stats.react ? stats.react + ' ms' : '—'} | Pattern Best: ${stats.pat}`;
-      document.getElementById('react-best').textContent = `Best: ${stats.react ? stats.react + ' ms' : '—'}  |  Avg (last 5): ${avg ? avg + ' ms' : '—'}`;
-    }
-    updateStatsDisplay();
-    document.getElementById('reset-stats').addEventListener('click', () => {
-      if (confirm('Reset all personal bests?')) {
-        stats = {seq:0, react:null, pat:0, reacts:[]};
-        saveStats();
+      const MODES = {
+        sequence: {
+          kicker: "Memory",
+          title: "Sequence",
+          summary: "A path of pads lights up. It grows by one each level.",
+          steps: [
+            "Watch the whole path. Pads can repeat.",
+            "When it goes quiet, tap the pads in the same order.",
+            "One miss ends the run. Your best is the highest level reached.",
+          ],
+        },
+        reaction: {
+          kicker: "Speed",
+          title: "Reaction",
+          summary: "Arm the round, wait out the red, then hit the mint signal.",
+          steps: [
+            "Tap the panel to start. It turns red — do not tap yet.",
+            "When it turns mint and says TAP, hit it immediately.",
+            "An early tap is a miss and is not saved. Best and the last five tries stay on this device.",
+          ],
+        },
+        pattern: {
+          kicker: "Attention",
+          title: "Pattern",
+          summary: "One tile is a different colour. The difference gets finer.",
+          steps: [
+            "Scan the grid and tap the odd tile.",
+            "Each correct pick starts a closer pair of colours.",
+            "A wrong tile ends the run. Your best is the longest streak.",
+          ],
+        },
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const app = $("app");
+      const viewMenu = $("view-menu");
+      const viewPlay = $("view-play");
+      const sheet = $("sheet");
+      const sheetTitle = $("sheet-title");
+      const sheetBody = $("sheet-body");
+      const sheetPrimary = $("sheet-primary");
+      const sheetSecondary = $("sheet-secondary");
+      const muteBtn = $("mute-btn");
+
+      let audioCtx = null;
+      let muted = localStorage.getItem("rbt-muted") === "1";
+      let mode = null;
+      let frozen = false;
+      let frozenWaiters = [];
+      let sheetPrimaryFn = () => {};
+      let sheetSecondaryFn = () => closeSheet();
+
+      function unlockAudio() {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!audioCtx) audioCtx = new AC({ latencyHint: "interactive" });
+        if (audioCtx.state === "suspended") audioCtx.resume();
       }
-    });
-
-    // Mode switching
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(btn.dataset.mode === 'sequence' ? 'seq-screen' : btn.dataset.mode === 'reaction' ? 'react-screen' : 'pat-screen').classList.add('active');
+      document.addEventListener("pointerdown", unlockAudio, { passive: true });
+      document.addEventListener("keydown", unlockAudio);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && audioCtx && audioCtx.state === "suspended") audioCtx.resume();
       });
-    });
 
-    // SEQUENCE
-    const seqBoard = document.getElementById('seq-board');
-    const seqCells = [];
-    for (let i = 0; i < 9; i++) {
-      const c = document.createElement('div'); c.className = 'cell'; c.dataset.i = i;
-      c.addEventListener('click', () => seqClick(i));
-      seqBoard.appendChild(c); seqCells.push(c);
-    }
-    let seq = [], pIdx = 0, level = 1, playingSeq = false, inputOk = false;
-    const seqScore = document.getElementById('seq-score');
-    const seqStart = document.getElementById('seq-start');
+      function tone(freq, dur, type, peak, delay) {
+        if (muted || !audioCtx || audioCtx.state !== "running") return;
+        const t0 = audioCtx.currentTime + (delay || 0);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || "sine";
+        osc.frequency.setValueAtTime(freq, t0);
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(peak || 0.08, t0 + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.02);
+      }
+      const PAD_NOTES = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5, 1174.66];
+      const sndPad = (i) => tone(PAD_NOTES[i] || 660, 0.18, "sine", 0.1);
+      const sndTick = () => tone(988, 0.05, "sine", 0.05);
+      const sndClear = () => { tone(659, 0.09, "triangle", 0.08, 0); tone(880, 0.14, "sine", 0.08, 0.08); };
+      const sndFail = () => { tone(196, 0.22, "sawtooth", 0.045, 0); tone(146, 0.28, "square", 0.03, 0.06); };
+      const sndGo = () => { tone(1480, 0.045, "square", 0.04, 0); tone(880, 0.1, "sine", 0.09, 0.02); };
+      const sndHit = () => { tone(740, 0.06, "triangle", 0.07, 0); tone(1175, 0.1, "sine", 0.06, 0.05); };
+      const sndEarly = () => { tone(210, 0.12, "square", 0.045, 0); tone(170, 0.16, "sawtooth", 0.03, 0.05); };
+      const sndPattern = () => tone(720, 0.07, "triangle", 0.07);
 
-    function flash(i, cls='active') {
-      return new Promise(r => {
-        seqCells[i].classList.add(cls);
-        if (cls === 'active') tone(440 + i*30, 0.18);
-        else if (cls === 'correct') tone(660, 0.1);
-        else if (cls === 'wrong') tone(180, 0.3, 'sawtooth');
-        setTimeout(() => { seqCells[i].classList.remove(cls); setTimeout(r, 100); }, 380);
+      function paintMute() {
+        muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
+        muteBtn.setAttribute("aria-label", muted ? "Unmute sound" : "Mute sound");
+      }
+      paintMute();
+      muteBtn.addEventListener("click", () => {
+        unlockAudio();
+        muted = !muted;
+        localStorage.setItem("rbt-muted", muted ? "1" : "0");
+        paintMute();
+        if (!muted) sndTick();
       });
-    }
-    async function playSeq() {
-      inputOk = false;
-      for (const i of seq) await flash(i);
-      inputOk = true; pIdx = 0;
-    }
-    function nextSeq() {
-      seq.push(Math.floor(Math.random()*9));
-      level = seq.length;
-      seqScore.textContent = `Level ${level}`;
-      if (level > stats.seq) { stats.seq = level; saveStats(); hubCall('score', level); }
-      setTimeout(playSeq, 500);
-    }
-    function seqClick(i) {
-      if (!inputOk || !playingSeq) return;
-      if (i === seq[pIdx]) {
-        flash(i, 'correct');
-        pIdx++;
-        if (pIdx === seq.length) {
-          inputOk = false;
-          hubCall('event', 'sequence-completed', { level });
-          setTimeout(nextSeq, 400);
+
+      function loadStats() {
+        try {
+          const raw = JSON.parse(localStorage.getItem("rbt-stats") || "null");
+          if (!raw || typeof raw !== "object") throw new Error("bad");
+          const reacts = Array.isArray(raw.reacts) ? raw.reacts.map(Number).filter((n) => n > 0).slice(-5) : [];
+          return {
+            seq: Number(raw.seq) || 0,
+            react: raw.react == null ? null : (Number(raw.react) || null),
+            pat: Number(raw.pat) || 0,
+            reacts,
+          };
+        } catch (err) {
+          return { seq: 0, react: null, pat: 0, reacts: [] };
         }
-      } else {
-        flash(i, 'wrong');
-        inputOk = false; playingSeq = false;
-        hubCall('gameOver', stats.seq, 0);
-        seqStart.disabled = false; seqStart.textContent = 'Try again';
       }
-    }
-    seqStart.addEventListener('click', () => {
-      seq = []; level = 1; playingSeq = true; seqStart.disabled = true;
-      hubCall('ready'); nextSeq();
-    });
+      let stats = loadStats();
+      const saveStats = () => {
+        localStorage.setItem("rbt-stats", JSON.stringify(stats));
+        paintBests();
+      };
+      const dash = (n) => (n ? String(n) : "—");
+      function paintBests() {
+        $("best-sequence").textContent = stats.seq ? `Best ${stats.seq}` : "Best —";
+        $("best-reaction").textContent = stats.react ? `Best ${stats.react} ms` : "Best —";
+        $("best-pattern").textContent = stats.pat ? `Best ${stats.pat}` : "Best —";
+        $("seq-best").textContent = dash(stats.seq);
+        $("pat-best").textContent = dash(stats.pat);
+        const avg = stats.reacts.length
+          ? Math.round(stats.reacts.reduce((a, b) => a + b, 0) / stats.reacts.length)
+          : null;
+        $("react-meta").textContent = `Best ${stats.react ? stats.react + " ms" : "—"} · Avg ${avg ? avg + " ms" : "—"}`;
+      }
+      paintBests();
 
-    // REACTION
-    const reactArea = document.getElementById('react-area');
-    const reactTime = document.getElementById('react-time');
-    let reactState = 'idle', startTime = 0, timeoutId;
-    reactArea.addEventListener('click', () => {
-      if (reactState === 'idle' || reactState === 'done') {
-        reactState = 'waiting';
-        reactArea.textContent = 'Wait for green…';
-        reactArea.className = 'reaction-area wait';
-        reactTime.textContent = '';
-        const delay = 800 + Math.random()*2200;
-        timeoutId = setTimeout(() => {
-          reactState = 'go';
-          reactArea.className = 'reaction-area go';
-          reactArea.textContent = 'TAP!';
-          tone(880, 0.08);
-          startTime = performance.now();
+      function setFrozen(next) {
+        frozen = next;
+        app.classList.toggle("is-frozen", next);
+        if (next) seqCells.forEach((cell) => cell.classList.remove("lit"));
+        if (!next) {
+          const queue = frozenWaiters;
+          frozenWaiters = [];
+          queue.forEach((fn) => fn());
+        }
+      }
+      function waitWhileFrozen() {
+        if (!frozen) return Promise.resolve();
+        return new Promise((resolve) => frozenWaiters.push(resolve));
+      }
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      function openSheet(opts) {
+        sheetTitle.textContent = opts.title;
+        sheetBody.replaceChildren();
+        (opts.paragraphs || []).forEach((text) => {
+          const p = document.createElement("p");
+          p.textContent = text;
+          sheetBody.appendChild(p);
+        });
+        if (opts.steps) {
+          const ul = document.createElement("ul");
+          opts.steps.forEach((text) => {
+            const li = document.createElement("li");
+            li.textContent = text;
+            ul.appendChild(li);
+          });
+          sheetBody.appendChild(ul);
+        }
+        sheetPrimary.textContent = opts.primary || "OK";
+        sheetPrimaryFn = opts.onPrimary || closeSheet;
+        if (opts.secondary) {
+          sheetSecondary.hidden = false;
+          sheetSecondary.textContent = opts.secondary;
+          sheetSecondaryFn = opts.onSecondary || closeSheet;
+        } else {
+          sheetSecondary.hidden = true;
+          sheetSecondaryFn = closeSheet;
+        }
+        sheet.hidden = false;
+        sheetPrimary.focus();
+      }
+      function closeSheet() {
+        sheet.hidden = true;
+        if (sheet.contains(document.activeElement)) muteBtn.focus();
+      }
+      sheetPrimary.addEventListener("click", () => sheetPrimaryFn());
+      sheetSecondary.addEventListener("click", () => sheetSecondaryFn());
+      sheet.addEventListener("click", (event) => {
+        if (event.target === sheet) sheetSecondaryFn();
+      });
+
+      function showMenu() {
+        stopAll();
+        mode = null;
+        viewMenu.classList.add("on");
+        viewPlay.classList.remove("on");
+        closeSheet();
+      }
+      function showPlay(next) {
+        mode = next;
+        viewMenu.classList.remove("on");
+        viewPlay.classList.add("on");
+        $("play-kicker").textContent = MODES[next].kicker;
+        $("play-title").textContent = MODES[next].title;
+        document.querySelectorAll(".panel").forEach((panel) => panel.classList.remove("on"));
+        $("panel-" + next).classList.add("on");
+      }
+
+      const pulseTimers = new WeakMap();
+      function pulse(cell, cls, ms) {
+        const prev = pulseTimers.get(cell);
+        if (prev) clearTimeout(prev);
+        cell.classList.remove("good", "bad", "lit", "reveal");
+        void cell.offsetWidth;
+        cell.classList.add(cls);
+        return new Promise((resolve) => {
+          const id = setTimeout(() => {
+            if (pulseTimers.get(cell) === id) {
+              cell.classList.remove(cls);
+              pulseTimers.delete(cell);
+            }
+            resolve();
+          }, ms);
+          pulseTimers.set(cell, id);
+        });
+      }
+
+      /* ---------- Sequence ---------- */
+      const seqBoard = $("seq-board");
+      const seqCells = [];
+      for (let i = 0; i < 9; i += 1) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "cell";
+        cell.setAttribute("aria-label", "Pad " + (i + 1));
+        cell.addEventListener("click", () => seqClick(i));
+        seqBoard.appendChild(cell);
+        seqCells.push(cell);
+      }
+      let seq = [];
+      let pIdx = 0;
+      let level = 1;
+      let inputOk = false;
+      let seqLive = false;
+      let seqToken = 0;
+
+      function setSeqHud() {
+        $("seq-level").textContent = String(level);
+        $("seq-best").textContent = dash(stats.seq);
+      }
+      function clearSeqRun() {
+        seq = [];
+        pIdx = 0;
+        level = 1;
+        inputOk = false;
+        seqBoard.classList.add("locked");
+        seqCells.forEach((cell) => cell.classList.remove("lit", "good", "bad"));
+        $("seq-result").hidden = true;
+      }
+      function beginSequence() {
+        unlockAudio();
+        stopAll();
+        showPlay("sequence");
+        clearSeqRun();
+        seqLive = true;
+        const token = seqToken;
+        hubCall("ready");
+        $("seq-status").textContent = "Watch carefully";
+        setSeqHud();
+        setTimeout(() => { nextSeq(token); }, 420);
+      }
+      async function nextSeq(token) {
+        if (token !== seqToken) return;
+        await waitWhileFrozen();
+        if (token !== seqToken) return;
+        seq.push(Math.floor(Math.random() * 9));
+        level = seq.length;
+        setSeqHud();
+        if (level > stats.seq) {
+          stats.seq = level;
+          saveStats();
+          hubCall("score", level);
+        }
+        $("seq-status").textContent = "Watch";
+        await sleep(460);
+        if (token !== seqToken) return;
+        await waitWhileFrozen();
+        if (token !== seqToken) return;
+        playSeq(token);
+      }
+      async function playSeq(token) {
+        inputOk = false;
+        seqBoard.classList.add("locked");
+        for (let step = 0; step < seq.length; step += 1) {
+          if (token !== seqToken) return;
+          await waitWhileFrozen();
+          if (token !== seqToken) return;
+          const index = seq[step];
+          $("seq-status").textContent = "Watch " + (step + 1) + " / " + seq.length;
+          sndPad(index);
+          await pulse(seqCells[index], "lit", 420);
+          if (token !== seqToken) return;
+          await sleep(130);
+        }
+        if (token !== seqToken) return;
+        pIdx = 0;
+        inputOk = true;
+        seqBoard.classList.remove("locked");
+        $("seq-status").textContent = "Your turn · 0 / " + seq.length;
+      }
+      function seqClick(i) {
+        if (!inputOk || frozen) return;
+        const token = seqToken;
+        if (i === seq[pIdx]) {
+          sndTick();
+          pulse(seqCells[i], "good", 180);
+          pIdx += 1;
+          $("seq-status").textContent = "Your turn · " + pIdx + " / " + seq.length;
+          if (pIdx === seq.length) {
+            inputOk = false;
+            seqBoard.classList.add("locked");
+            sndClear();
+            $("seq-status").textContent = "Correct";
+            hubCall("event", "sequence-completed", { level });
+            setTimeout(() => nextSeq(token), 520);
+          }
+        } else {
+          inputOk = false;
+          seqLive = false;
+          seqBoard.classList.add("locked");
+          sndFail();
+          pulse(seqCells[i], "bad", 380);
+          $("seq-status").textContent = "Missed";
+          $("seq-result-copy").textContent = "Reached level " + level + ". Best is " + stats.seq + ".";
+          $("seq-result").hidden = false;
+          hubCall("gameOver", stats.seq, 0);
+        }
+      }
+
+      /* ---------- Reaction ---------- */
+      const arena = $("react-area");
+      const readout = $("react-readout");
+      let reactState = "idle";
+      let reactEpoch = 0;
+      let reactTimer = 0;
+      let reactStart = 0;
+
+      function paintReaction(state, label, readoutText) {
+        reactState = state;
+        arena.classList.remove("is-wait", "is-go", "is-early");
+        if (state === "waiting") arena.classList.add("is-wait");
+        if (state === "go") arena.classList.add("is-go");
+        if (state === "early") arena.classList.add("is-early");
+        arena.textContent = label;
+        readout.textContent = readoutText;
+      }
+      function clearReactTimer() {
+        if (reactTimer) clearTimeout(reactTimer);
+        reactTimer = 0;
+      }
+      function beginReaction() {
+        unlockAudio();
+        stopAll();
+        showPlay("reaction");
+        reactEpoch += 1;
+        paintReaction("idle", "Tap to start", "Ready");
+        $("react-status").textContent = "Tap the panel to arm the round.";
+        arena.focus();
+      }
+      function armReaction() {
+        unlockAudio();
+        const epoch = ++reactEpoch;
+        paintReaction("waiting", "Wait", "Hold");
+        $("react-status").textContent = "Wait for mint.";
+        const delay = 800 + Math.random() * 2200;
+        clearReactTimer();
+        reactTimer = setTimeout(() => {
+          if (epoch !== reactEpoch || frozen) return;
+          paintReaction("go", "TAP", "Now");
+          $("react-status").textContent = "Tap now.";
+          sndGo();
+          reactStart = performance.now();
         }, delay);
-      } else if (reactState === 'waiting') {
-        clearTimeout(timeoutId);
-        reactState = 'done';
-        reactArea.className = 'reaction-area';
-        reactArea.textContent = 'Too early! Tap to retry';
-        reactTime.textContent = 'Early';
-        tone(180, 0.25, 'sawtooth');
-      } else if (reactState === 'go') {
-        const ms = Math.round(performance.now() - startTime);
-        reactState = 'done';
-        reactArea.className = 'reaction-area';
-        reactArea.textContent = `${ms} ms — Tap to retry`;
-        reactTime.textContent = ms + ' ms';
-        tone(520, 0.1);
-        if (!stats.reacts) stats.reacts = [];
+      }
+      function finishReaction(ms) {
+        reactEpoch += 1;
+        clearReactTimer();
+        reactState = "done";
+        arena.classList.remove("is-wait", "is-go", "is-early");
+        arena.textContent = "Tap to try again";
+        readout.replaceChildren(document.createTextNode(String(ms)));
+        const unit = document.createElement("span");
+        unit.textContent = "ms";
+        readout.appendChild(unit);
+        $("react-status").textContent = ms < 220 ? "Sharp." : ms < 320 ? "Clean." : "Room to tighten.";
+        sndHit();
         stats.reacts.push(ms);
         if (stats.reacts.length > 5) stats.reacts.shift();
         if (!stats.react || ms < stats.react) {
-          stats.react = ms; hubCall('score', 1000 - Math.min(ms, 999));
-          hubCall('event', 'reaction-best', { ms });
+          stats.react = ms;
+          hubCall("score", 1000 - Math.min(ms, 999));
+          hubCall("event", "reaction-best", { ms });
         }
         saveStats();
-        hubCall('event', 'reaction-completed', { ms });
+        hubCall("event", "reaction-completed", { ms });
       }
-    });
+      arena.addEventListener("click", () => {
+        if (mode !== "reaction" || frozen) return;
+        unlockAudio();
+        if (reactState === "idle" || reactState === "done" || reactState === "early") {
+          armReaction();
+          return;
+        }
+        if (reactState === "waiting") {
+          reactEpoch += 1;
+          clearReactTimer();
+          paintReaction("early", "Too soon", "Early");
+          $("react-status").textContent = "That one does not count. Tap to arm again.";
+          sndEarly();
+          return;
+        }
+        if (reactState === "go") {
+          finishReaction(Math.round(performance.now() - reactStart));
+        }
+      });
 
-    // PATTERN
-    const patBoard = document.getElementById('pat-board');
-    const patScore = document.getElementById('pat-score');
-    const patStart = document.getElementById('pat-start');
-    let patRound = 1, patPlaying = false, oddIndex = -1;
-    const patCells = [];
-    for (let i = 0; i < 16; i++) {
-      const c = document.createElement('div'); c.className = 'p-cell';
-      c.addEventListener('click', () => patClick(i));
-      patBoard.appendChild(c); patCells.push(c);
-    }
-    function startPatRound() {
-      patCells.forEach(c => c.className = 'p-cell');
-      oddIndex = Math.floor(Math.random()*16);
-      patCells[oddIndex].classList.add('odd');
-      patScore.textContent = `Round ${patRound}`;
-    }
-    function patClick(i) {
-      if (!patPlaying) return;
-      if (i === oddIndex) {
-        tone(620, 0.08);
-        patRound++;
-        if (patRound - 1 > stats.pat) { stats.pat = patRound - 1; saveStats(); hubCall('score', stats.pat); }
-        hubCall('event', 'pattern-correct', { round: patRound - 1 });
-        startPatRound();
-      } else {
-        tone(180, 0.25, 'sawtooth');
-        patPlaying = false;
-        hubCall('gameOver', stats.pat, 0);
-        patStart.disabled = false; patStart.textContent = 'Try again';
-        patScore.textContent = `Missed! Best ${stats.pat}`;
+      /* ---------- Pattern ---------- */
+      const patBoard = $("pat-board");
+      const patCells = [];
+      for (let i = 0; i < 16; i += 1) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "pcell";
+        cell.setAttribute("aria-label", "Tile " + (i + 1));
+        cell.addEventListener("click", () => patClick(i));
+        patBoard.appendChild(cell);
+        patCells.push(cell);
       }
-    }
-    patStart.addEventListener('click', () => {
-      patRound = 1; patPlaying = true; patStart.disabled = true;
-      hubCall('ready'); startPatRound();
-    });
+      let patRound = 1;
+      let patLive = false;
+      let patToken = 0;
+      let oddIndex = -1;
 
-    hubCall('ready');
+      function colorsForRound(round) {
+        const base = { h: 214, s: 18, l: 28 };
+        const start = { h: 166, s: 64, l: 62 };
+        const t = Math.min(0.8, (round - 1) * 0.055);
+        const odd = {
+          h: start.h + (base.h - start.h) * t,
+          s: start.s + (base.s - start.s) * t,
+          l: start.l + (base.l - start.l) * t,
+        };
+        const hsl = (c) => "hsl(" + c.h.toFixed(1) + " " + c.s.toFixed(1) + "% " + c.l.toFixed(1) + "%)";
+        return { base: hsl(base), odd: hsl(odd) };
+      }
+      function paintPattern() {
+        const colors = colorsForRound(patRound);
+        patCells.forEach((cell, i) => {
+          cell.style.background = i === oddIndex ? colors.odd : colors.base;
+          cell.classList.remove("good", "bad", "reveal");
+        });
+        $("pat-level").textContent = String(patRound);
+      }
+      function dealPattern() {
+        oddIndex = Math.floor(Math.random() * 16);
+        paintPattern();
+        $("pat-status").textContent = "Find the different colour.";
+      }
+      function beginPattern() {
+        unlockAudio();
+        stopAll();
+        showPlay("pattern");
+        patToken += 1;
+        patRound = 1;
+        patLive = true;
+        $("pat-result").hidden = true;
+        hubCall("ready");
+        dealPattern();
+      }
+      function patClick(i) {
+        if (!patLive || frozen || mode !== "pattern") return;
+        if (i === oddIndex) {
+          sndPattern();
+          pulse(patCells[i], "good", 160);
+          const cleared = patRound;
+          patRound += 1;
+          if (cleared > stats.pat) {
+            stats.pat = cleared;
+            saveStats();
+            hubCall("score", stats.pat);
+          }
+          hubCall("event", "pattern-correct", { round: cleared });
+          patLive = false;
+          const token = patToken;
+          setTimeout(() => {
+            if (token !== patToken || mode !== "pattern") return;
+            patLive = true;
+            dealPattern();
+          }, 150);
+        } else {
+          patLive = false;
+          sndFail();
+          pulse(patCells[i], "bad", 360);
+          patCells[oddIndex].classList.add("reveal");
+          const cleared = Math.max(0, patRound - 1);
+          $("pat-status").textContent = "Missed";
+          $("pat-result-copy").textContent = "Cleared " + cleared + ". Best is " + stats.pat + ".";
+          $("pat-result").hidden = false;
+          hubCall("gameOver", stats.pat, 0);
+        }
+      }
+
+      function stopAll() {
+        seqToken += 1;
+        seqLive = false;
+        reactEpoch += 1;
+        patToken += 1;
+        clearReactTimer();
+        inputOk = false;
+        patLive = false;
+        setFrozen(false);
+        seqBoard.classList.add("locked");
+      }
+
+      function openHelp(which, fromPlay) {
+        const info = MODES[which];
+        const reactionLive = fromPlay && mode === "reaction" && (reactState === "waiting" || reactState === "go");
+        const wasLive = fromPlay && (seqLive || patLive || reactionLive);
+        if (wasLive) {
+          setFrozen(true);
+          if (reactionLive) {
+            reactEpoch += 1;
+            clearReactTimer();
+            paintReaction("idle", "Tap to start", "Ready");
+            $("react-status").textContent = "Round reset. Tap to arm again.";
+          }
+        }
+        openSheet({
+          title: info.title,
+          paragraphs: [info.summary],
+          steps: info.steps,
+          primary: fromPlay ? "Resume" : "Play",
+          secondary: "Close",
+          onPrimary: () => {
+            closeSheet();
+            if (fromPlay) {
+              setFrozen(false);
+              return;
+            }
+            startMode(which);
+          },
+          onSecondary: () => {
+            closeSheet();
+            if (wasLive) setFrozen(false);
+          },
+        });
+      }
+
+      function startMode(which) {
+        closeSheet();
+        setFrozen(false);
+        if (which === "sequence") beginSequence();
+        else if (which === "reaction") beginReaction();
+        else beginPattern();
+      }
+
+      document.querySelectorAll("[data-start]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          unlockAudio();
+          startMode(btn.getAttribute("data-start"));
+        });
+      });
+      document.querySelectorAll("[data-help]").forEach((btn) => {
+        btn.addEventListener("click", () => openHelp(btn.getAttribute("data-help"), false));
+      });
+      $("help-btn").addEventListener("click", () => { if (mode) openHelp(mode, true); });
+      $("back-btn").addEventListener("click", showMenu);
+      $("pause-btn").addEventListener("click", () => {
+        if (!mode || frozen) return;
+        const reactionLive = mode === "reaction" && (reactState === "waiting" || reactState === "go");
+        setFrozen(true);
+        if (reactionLive) {
+          reactEpoch += 1;
+          clearReactTimer();
+          paintReaction("idle", "Tap to start", "Ready");
+        }
+        openSheet({
+          title: "Paused",
+          paragraphs: [
+            reactionLive
+              ? "This reaction round restarts when you resume."
+              : "The board is hidden until you resume.",
+          ],
+          primary: "Resume",
+          secondary: "Main menu",
+          onPrimary: () => { closeSheet(); setFrozen(false); },
+          onSecondary: () => { closeSheet(); setFrozen(false); showMenu(); },
+        });
+      });
+      $("seq-retry").addEventListener("click", () => startMode("sequence"));
+      $("pat-retry").addEventListener("click", () => startMode("pattern"));
+      $("reset-btn").addEventListener("click", () => {
+        openSheet({
+          title: "Reset bests?",
+          paragraphs: ["Sequence, reaction and pattern records on this device will clear. This cannot be undone."],
+          primary: "Reset",
+          secondary: "Cancel",
+          onPrimary: () => {
+            stats = { seq: 0, react: null, pat: 0, reacts: [] };
+            saveStats();
+            closeSheet();
+          },
+          onSecondary: closeSheet,
+        });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.repeat) return;
+        if (!sheet.hidden) {
+          if (event.key === "Escape") sheetSecondaryFn();
+          if (event.key === "Tab") {
+            const nodes = [sheetSecondary, sheetPrimary].filter((btn) => !btn.hidden);
+            if (!nodes.length) return;
+            const first = nodes[0];
+            const last = nodes[nodes.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+          }
+          return;
+        }
+        if (event.key === "Escape" && mode) {
+          $("pause-btn").click();
+          return;
+        }
+        if (!mode || frozen) return;
+        if (mode === "sequence" && event.key >= "1" && event.key <= "9") seqClick(Number(event.key) - 1);
+        if (mode === "reaction" && (event.key === " " || event.key === "Enter") && document.activeElement !== arena) {
+          event.preventDefault();
+          arena.click();
+        }
+      });
+    })();
   </script>
 </body>
 </html>
