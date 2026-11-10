@@ -12,6 +12,7 @@
     .menu { display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center; margin:1rem 0; }
     .mode-btn, button { padding:0.7rem 1.2rem; border:0; border-radius:8px; background:var(--accent); color:#0f1419; font-weight:600; cursor:pointer; font-size:1rem; }
     .mode-btn.active { outline:2px solid #fff; }
+    button.secondary { background:#30363d; color:var(--fg); }
     button:disabled { opacity:0.5; cursor:not-allowed; }
     .screen { width:100%; max-width:420px; display:none; flex-direction:column; align-items:center; }
     .screen.active { display:flex; }
@@ -22,12 +23,13 @@
     .cell.wrong { background:var(--bad); }
     .stats, .info { margin:0.5rem 0; text-align:center; opacity:0.9; }
     .big { font-size:2.5rem; font-weight:700; margin:1rem 0; }
-    .reaction-area { width:280px; height:180px; border-radius:16px; background:#21262d; display:flex; align-items:center; justify-content:center; font-size:1.2rem; cursor:pointer; margin:1rem 0; border:2px solid var(--border); }
+    .reaction-area { width:280px; height:180px; border-radius:16px; background:#21262d; display:flex; align-items:center; justify-content:center; font-size:1.2rem; cursor:pointer; margin:1rem 0; border:2px solid var(--border); transition:background .1s; }
     .reaction-area.wait { background:#f85149; }
     .reaction-area.go { background:var(--good); }
     .pattern { display:grid; grid-template-columns:repeat(4,70px); gap:8px; margin:1rem 0; }
-    .p-cell { width:70px; height:70px; border-radius:10px; background:#21262d; border:2px solid var(--border); cursor:pointer; }
+    .p-cell { width:70px; height:70px; border-radius:10px; background:#21262d; border:2px solid var(--border); cursor:pointer; transition:transform .1s; }
     .p-cell.odd { background:#58a6ff; }
+    .footer { margin-top:1.5rem; }
   </style>
 </head>
 <body>
@@ -39,7 +41,6 @@
   </div>
   <div id="stats" class="stats">Best Sequence: 0 | Best Reaction: — | Pattern Best: 0</div>
 
-  <!-- Sequence -->
   <div id="seq-screen" class="screen active">
     <div class="info">Watch the sequence, then repeat it</div>
     <div class="score" id="seq-score">Level 1</div>
@@ -47,15 +48,13 @@
     <button id="seq-start">Start Sequence</button>
   </div>
 
-  <!-- Reaction -->
   <div id="react-screen" class="screen">
     <div class="info">Wait for green, then tap as fast as you can</div>
     <div class="big" id="react-time">Ready</div>
     <div class="reaction-area" id="react-area">Tap to start</div>
-    <div class="info" id="react-best">Best: — ms</div>
+    <div class="info" id="react-best">Best: — ms &nbsp;|&nbsp; Avg (last 5): —</div>
   </div>
 
-  <!-- Pattern -->
   <div id="pat-screen" class="screen">
     <div class="info">Find the different colour</div>
     <div class="score" id="pat-score">Round 1</div>
@@ -63,16 +62,41 @@
     <button id="pat-start">Start Pattern</button>
   </div>
 
+  <div class="footer"><button class="secondary" id="reset-stats">Reset all bests</button></div>
+
   <script>
     const hubCall = (method, ...args) => { try { const s = window.Hub; if (typeof s?.[method] === 'function') s[method](...args); } catch {} };
 
+    // Simple audio
+    let audioCtx;
+    function tone(freq, dur=0.12, type='sine') {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + dur);
+      } catch {}
+    }
+
     // Stats
-    const stats = JSON.parse(localStorage.getItem('rbt-stats') || '{"seq":0,"react":null,"pat":0}');
+    let stats = JSON.parse(localStorage.getItem('rbt-stats') || '{"seq":0,"react":null,"pat":0,"reacts":[]}');
     function saveStats() { localStorage.setItem('rbt-stats', JSON.stringify(stats)); updateStatsDisplay(); }
     function updateStatsDisplay() {
+      const avg = stats.reacts && stats.reacts.length ? Math.round(stats.reacts.reduce((a,b)=>a+b,0)/stats.reacts.length) : null;
       document.getElementById('stats').textContent = `Best Sequence: ${stats.seq} | Best Reaction: ${stats.react ? stats.react + ' ms' : '—'} | Pattern Best: ${stats.pat}`;
+      document.getElementById('react-best').textContent = `Best: ${stats.react ? stats.react + ' ms' : '—'}  |  Avg (last 5): ${avg ? avg + ' ms' : '—'}`;
     }
     updateStatsDisplay();
+    document.getElementById('reset-stats').addEventListener('click', () => {
+      if (confirm('Reset all personal bests?')) {
+        stats = {seq:0, react:null, pat:0, reacts:[]};
+        saveStats();
+      }
+    });
 
     // Mode switching
     document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -84,7 +108,7 @@
       });
     });
 
-    // === SEQUENCE ===
+    // SEQUENCE
     const seqBoard = document.getElementById('seq-board');
     const seqCells = [];
     for (let i = 0; i < 9; i++) {
@@ -97,7 +121,13 @@
     const seqStart = document.getElementById('seq-start');
 
     function flash(i, cls='active') {
-      return new Promise(r => { seqCells[i].classList.add(cls); setTimeout(() => { seqCells[i].classList.remove(cls); setTimeout(r, 100); }, 380); });
+      return new Promise(r => {
+        seqCells[i].classList.add(cls);
+        if (cls === 'active') tone(440 + i*30, 0.18);
+        else if (cls === 'correct') tone(660, 0.1);
+        else if (cls === 'wrong') tone(180, 0.3, 'sawtooth');
+        setTimeout(() => { seqCells[i].classList.remove(cls); setTimeout(r, 100); }, 380);
+      });
     }
     async function playSeq() {
       inputOk = false;
@@ -133,13 +163,10 @@
       hubCall('ready'); nextSeq();
     });
 
-    // === REACTION ===
+    // REACTION
     const reactArea = document.getElementById('react-area');
     const reactTime = document.getElementById('react-time');
-    const reactBest = document.getElementById('react-best');
     let reactState = 'idle', startTime = 0, timeoutId;
-    function updateReactBest() { reactBest.textContent = `Best: ${stats.react ? stats.react + ' ms' : '—'}`; }
-    updateReactBest();
     reactArea.addEventListener('click', () => {
       if (reactState === 'idle' || reactState === 'done') {
         reactState = 'waiting';
@@ -151,6 +178,7 @@
           reactState = 'go';
           reactArea.className = 'reaction-area go';
           reactArea.textContent = 'TAP!';
+          tone(880, 0.08);
           startTime = performance.now();
         }, delay);
       } else if (reactState === 'waiting') {
@@ -159,22 +187,27 @@
         reactArea.className = 'reaction-area';
         reactArea.textContent = 'Too early! Tap to retry';
         reactTime.textContent = 'Early';
+        tone(180, 0.25, 'sawtooth');
       } else if (reactState === 'go') {
         const ms = Math.round(performance.now() - startTime);
         reactState = 'done';
         reactArea.className = 'reaction-area';
         reactArea.textContent = `${ms} ms — Tap to retry`;
         reactTime.textContent = ms + ' ms';
+        tone(520, 0.1);
+        if (!stats.reacts) stats.reacts = [];
+        stats.reacts.push(ms);
+        if (stats.reacts.length > 5) stats.reacts.shift();
         if (!stats.react || ms < stats.react) {
-          stats.react = ms; saveStats(); hubCall('score', 1000 - Math.min(ms, 999));
+          stats.react = ms; hubCall('score', 1000 - Math.min(ms, 999));
           hubCall('event', 'reaction-best', { ms });
         }
+        saveStats();
         hubCall('event', 'reaction-completed', { ms });
-        updateReactBest();
       }
     });
 
-    // === PATTERN ===
+    // PATTERN
     const patBoard = document.getElementById('pat-board');
     const patScore = document.getElementById('pat-score');
     const patStart = document.getElementById('pat-start');
@@ -194,11 +227,13 @@
     function patClick(i) {
       if (!patPlaying) return;
       if (i === oddIndex) {
+        tone(620, 0.08);
         patRound++;
-        if (patRound > stats.pat) { stats.pat = patRound - 1; saveStats(); hubCall('score', stats.pat); }
+        if (patRound - 1 > stats.pat) { stats.pat = patRound - 1; saveStats(); hubCall('score', stats.pat); }
         hubCall('event', 'pattern-correct', { round: patRound - 1 });
         startPatRound();
       } else {
+        tone(180, 0.25, 'sawtooth');
         patPlaying = false;
         hubCall('gameOver', stats.pat, 0);
         patStart.disabled = false; patStart.textContent = 'Try again';
