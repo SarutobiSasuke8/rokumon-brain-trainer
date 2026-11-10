@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rokumon Brain Trainer — Sequence Memory</title>
+  <style>
+    :root { --bg: #0f1419; --fg: #e6edf3; --accent: #58a6ff; --good: #3fb950; --bad: #f85149; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+    h1 { margin: 0 0 0.5rem; font-size: 1.4rem; }
+    .info { margin-bottom: 1rem; opacity: 0.8; }
+    .board { display: grid; grid-template-columns: repeat(3, 80px); gap: 12px; margin: 1rem 0; }
+    .cell { width: 80px; height: 80px; border-radius: 12px; background: #21262d; border: 2px solid #30363d; cursor: pointer; transition: background 0.15s; }
+    .cell.active { background: var(--accent); }
+    .cell.correct { background: var(--good); }
+    .cell.wrong { background: var(--bad); }
+    button { padding: 0.6rem 1.2rem; border: 0; border-radius: 8px; background: var(--accent); color: #0f1419; font-weight: 600; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .score { font-size: 1.1rem; margin: 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Rokumon Brain Trainer</h1>
+  <div class="info">Sequence Memory — watch, then repeat</div>
+  <div class="score" id="score">Level: 1 &nbsp; Best: 0</div>
+  <div class="board" id="board"></div>
+  <button id="start">Start</button>
+  <script>
+    const board = document.getElementById('board');
+    const startBtn = document.getElementById('start');
+    const scoreEl = document.getElementById('score');
+    const cells = [];
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.i = i;
+      cell.addEventListener('click', () => onCellClick(i));
+      board.appendChild(cell);
+      cells.push(cell);
+    }
+
+    let sequence = [];
+    let playerIndex = 0;
+    let level = 1;
+    let best = Number(localStorage.getItem('rbt-best') || 0);
+    let playing = false;
+    let inputEnabled = false;
+
+    function updateScore() {
+      scoreEl.textContent = `Level: ${level}   Best: ${best}`;
+    }
+    updateScore();
+
+    function hubCall(method, ...args) {
+      try {
+        const sdk = window.Hub;
+        if (typeof sdk?.[method] === 'function') sdk[method](...args);
+      } catch {}
+    }
+
+    function flash(index, cls = 'active') {
+      return new Promise(resolve => {
+        cells[index].classList.add(cls);
+        setTimeout(() => {
+          cells[index].classList.remove(cls);
+          setTimeout(resolve, 120);
+        }, 420);
+      });
+    }
+
+    async function playSequence() {
+      inputEnabled = false;
+      for (const idx of sequence) {
+        await flash(idx);
+      }
+      inputEnabled = true;
+      playerIndex = 0;
+    }
+
+    function nextLevel() {
+      sequence.push(Math.floor(Math.random() * 9));
+      level = sequence.length;
+      updateScore();
+      if (level > best) {
+        best = level;
+        localStorage.setItem('rbt-best', String(best));
+        hubCall('score', best);
+      }
+      setTimeout(playSequence, 600);
+    }
+
+    function onCellClick(i) {
+      if (!inputEnabled || !playing) return;
+      const expected = sequence[playerIndex];
+      if (i === expected) {
+        flash(i, 'correct');
+        playerIndex++;
+        if (playerIndex === sequence.length) {
+          inputEnabled = false;
+          hubCall('event', 'sequence-completed', { level });
+          setTimeout(nextLevel, 500);
+        }
+      } else {
+        flash(i, 'wrong');
+        inputEnabled = false;
+        playing = false;
+        hubCall('gameOver', best, 0);
+        startBtn.disabled = false;
+        startBtn.textContent = 'Try again';
+      }
+    }
+
+    startBtn.addEventListener('click', () => {
+      sequence = [];
+      level = 1;
+      playing = true;
+      startBtn.disabled = true;
+      hubCall('ready');
+      nextLevel();
+    });
+
+    hubCall('ready');
+  </script>
+</body>
+</html>
