@@ -3,20 +3,20 @@
   "title": "Rokumon Brain Trainer",
   "tagline": "Sequence, reaction and pattern drills.",
   "description": "Three short cognitive modes: sequence memory, reaction time and odd-one-out pattern. Personal bests stored locally, scores and events reported to the hub.",
-  "status": "alpha",
+  "status": "released",
   "visibility": "unlisted",
   "featured": false,
-  "version": "0.2.0",
-  "releasedAt": null,
+  "version": "1.0.0",
+  "releasedAt": "2026-11-10",
   "updatedAt": "2026-11-10",
   "delivery": {
     "mode": "embedded",
-    "release": "0.2.0",
+    "release": "1.0.0",
     "budget": { "maxBundleBytes": 1048576, "maxFiles": 8 }
   },
   "genres": ["Puzzle", "Brain"],
   "tags": ["memory", "sequence", "reaction", "pattern", "short-session", "mobile", "single-player"],
-  "controls": ["mouse", "touch"],
+  "controls": ["mouse", "touch", "keyboard"],
   "players": { "min": 1, "max": 1 },
   "support": { "desktop": "full", "mobile": "full" },
   "media": {
@@ -25,11 +25,11 @@
     "logo": null,
     "screenshots": []
   },
-  "theme": { "accent": "#58a6ff", "background": "#0f1419" },
+  "theme": { "accent": "#f0c15a", "background": "#080b10" },
   "credits": {
     "developer": "Rokumon Games",
-    "art": null,
-    "audio": null
+    "art": "In-file SVG",
+    "audio": "Web Audio"
   },
   "runtime": {
     "kind": "iframe",
@@ -42,7 +42,7 @@
   "bridge": {
     "version": 1,
     "enabled": true,
-    "capabilities": ["score", "event"],
+    "capabilities": ["ready", "score", "event", "gameOver"],
     "events": [
       { "name": "sequence-completed", "properties": { "level": "number" } },
       { "name": "reaction-completed", "properties": { "ms": "number" } },
@@ -54,7 +54,7 @@
     "repo": "https://github.com/SarutobiSasuke8/rokumon-brain-trainer",
     "localPath": null,
     "bundlePath": null,
-    "bundleIncludes": null,
+    "bundleIncludes": ["index.html", "game-hub-manifest.json", "README.md"],
     "buildCommand": null
   }
 }
