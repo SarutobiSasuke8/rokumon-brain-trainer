@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080b10">
-  <meta name="description" content="Sequence, reaction and pattern drills. Short sessions, bests saved on this device.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Brain Trainer">
+  <meta name="description" content="Six short drills for memory, speed, attention, focus, sums and control. Pass the six gates each day. Bests saved on this device.">
   <title>Rokumon Brain Trainer</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080b10'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23f0c15a'/%3E%3Ccircle cx='16' cy='6.2' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='24.5' cy='11.1' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='24.5' cy='20.9' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='16' cy='25.8' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='7.5' cy='20.9' r='2' fill='%23f0c15a'/%3E%3Ccircle cx='7.5' cy='11.1' r='2' fill='%23f0c15a'/%3E%3C/svg%3E">
   <style>
@@ -12,6 +16,7 @@
       --bg: #080b10;
       --bg-2: #10151d;
       --surface: #141b26;
+      --surface-2: #1a2333;
       --line: #2c384c;
       --line-strong: #3d4e68;
       --fg: #e7eef8;
@@ -35,16 +40,24 @@
 
     html, body {
       margin: 0;
-      min-height: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
       background: var(--bg);
       color: var(--fg);
       font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
       font-size: 16px;
       line-height: 1.45;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
 
     body {
-      min-height: 100dvh;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
       background:
         radial-gradient(900px 520px at 50% -10%, rgba(240, 193, 90, 0.16), transparent 58%),
         radial-gradient(700px 480px at 110% 110%, rgba(94, 224, 196, 0.08), transparent 46%),
@@ -60,36 +73,39 @@
       opacity: 0.9;
     }
 
-    button { font: inherit; color: inherit; cursor: pointer; }
+    button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
     button:disabled { opacity: 0.45; cursor: not-allowed; }
     :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+    p { margin: 0; }
 
     .app {
       position: relative;
       z-index: 1;
       width: min(480px, 100%);
+      height: 100vh;
+      height: 100dvh;
       margin: 0 auto;
-      min-height: 100dvh;
       padding:
-        calc(18px + env(safe-area-inset-top))
-        var(--pad)
-        calc(32px + env(safe-area-inset-bottom));
+        calc(14px + env(safe-area-inset-top))
+        calc(var(--pad) + env(safe-area-inset-right))
+        calc(14px + env(safe-area-inset-bottom))
+        calc(var(--pad) + env(safe-area-inset-left));
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
     }
 
     .top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
+      flex: none;
     }
-
+    .top-actions { display: flex; gap: 8px; }
     .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .mark { width: 42px; height: 42px; flex: none; }
     .kicker {
-      margin: 0;
       color: var(--gold);
       font-size: 0.72rem;
       font-weight: 700;
@@ -98,22 +114,22 @@
     }
     h1 {
       margin: 0;
-      font-size: 1.45rem;
+      font-size: 1.4rem;
       line-height: 1.1;
       letter-spacing: -0.03em;
       font-weight: 700;
     }
 
-    .icon-btn, .text-btn, .btn, .card-help, .card-main {
+    .icon-btn, .btn, .tile, .answer, .switch {
       border: 1px solid transparent;
       background: transparent;
-      transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease, filter 150ms ease, color 150ms ease;
+      transition: transform 120ms ease, border-color 150ms ease, background-color 150ms ease, filter 150ms ease, color 150ms ease;
     }
-    .icon-btn:active, .btn:active, .card-main:active, .text-btn:active, .card-help:active { transform: scale(0.96); }
+    .icon-btn:active, .btn:active, .tile:active { transform: scale(0.96); }
 
     .icon-btn {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 14px;
       border-color: var(--line);
       background: rgba(20, 27, 38, 0.8);
@@ -122,22 +138,28 @@
       flex: none;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
-    .icon-btn:hover { border-color: var(--gold); }
     .icon-btn svg { width: 20px; height: 20px; display: block; }
     .icon-btn .when-on, .icon-btn[aria-pressed="true"] .when-off { display: none; }
     .icon-btn[aria-pressed="true"] .when-on { display: block; }
-
-    .lede { margin: 0; color: var(--muted); max-width: 38ch; }
 
     .view { display: none; }
     .view.on {
       display: flex;
       flex-direction: column;
       gap: 14px;
-      animation: rise 280ms ease;
+      flex: 1;
+      min-height: 0;
+      animation: rise 260ms ease;
     }
+    #view-menu.on {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+      margin: 0 -4px;
+      padding: 0 4px 4px;
+    }
+    #view-menu::-webkit-scrollbar { display: none; }
 
-    .cards { display: flex; flex-direction: column; gap: 12px; }
     .card {
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%),
@@ -145,194 +167,221 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      overflow: hidden;
     }
-    .card-main {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 44px minmax(0, 1fr) 72px;
-      gap: 12px;
+
+    /* ---------- Home ---------- */
+    .today { padding: 16px; display: flex; flex-direction: column; gap: 14px; flex: none; }
+    .today-row { display: flex; align-items: center; gap: 16px; }
+    .crest { flex: none; width: 104px; height: 104px; }
+    .crest svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .crest .gate { fill: #141b26; stroke: var(--line-strong); stroke-width: 1.5; transition: fill 300ms ease, stroke 300ms ease; }
+    .crest .gate.on { fill: var(--gold); stroke: #ffe7a8; filter: drop-shadow(0 0 5px rgba(240, 193, 90, 0.7)); }
+    .crest .gate.fresh { animation: gateIn 700ms ease; transform-box: fill-box; transform-origin: center; }
+    .crest .ring { fill: none; stroke: rgba(240, 193, 90, 0.22); stroke-width: 1; }
+    .crest .core { fill: #101722; stroke: var(--line-strong); stroke-width: 1.5; }
+    .crest.full .core { fill: var(--gold); stroke: #ffe7a8; filter: drop-shadow(0 0 8px rgba(240, 193, 90, 0.8)); }
+    .crest text { fill: var(--fg); font-size: 15px; font-weight: 800; text-anchor: middle; dominant-baseline: central; font-variant-numeric: tabular-nums; }
+    .crest.full text { fill: var(--ink); }
+    .today-copy { min-width: 0; flex: 1; }
+    .today-copy strong { display: block; font-size: 1.3rem; letter-spacing: -0.03em; line-height: 1.15; margin-top: 2px; }
+    .today-copy p.sub { color: var(--muted); font-size: 0.88rem; margin-top: 2px; }
+    .week { display: flex; gap: 6px; margin-top: 10px; }
+    .week span {
+      width: 26px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      text-align: left;
-      padding: 14px 14px 8px;
-      min-height: 108px;
-      border: 0;
+      gap: 4px;
+      color: var(--faint);
+      font-size: 0.66rem;
+      font-weight: 700;
     }
-    .card-main:hover { background: rgba(240, 193, 90, 0.05); }
-    .card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+    .week i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: block; }
+    .week .some i { border-color: var(--gold); }
+    .week .met i { background: var(--gold); border-color: #ffe7a8; box-shadow: 0 0 8px rgba(240, 193, 90, 0.5); }
+    .week .now { color: var(--fg); }
+
+    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: none; }
+    .tile {
+      position: relative;
+      text-align: left;
+      padding: 12px;
+      min-height: 104px;
+      border-radius: 18px;
+      border-color: var(--line);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 42%),
+        var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tile-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .tile-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
       background: rgba(240, 193, 90, 0.1);
       border: 1px solid rgba(240, 193, 90, 0.28);
     }
-    .card-icon svg { width: 26px; height: 26px; display: block; }
-    .card-name { display: block; font-weight: 700; letter-spacing: -0.02em; font-size: 1.05rem; }
-    .card-desc { display: block; color: var(--muted); font-size: 0.86rem; margin-top: 2px; }
-    .card-best {
-      display: block;
-      margin-top: 6px;
-      color: var(--gold);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      font-variant-numeric: tabular-nums;
-    }
-    .card-help {
-      width: 100%;
-      min-height: 44px;
-      border: 0;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      text-align: left;
-      padding: 0 14px;
-      font-size: 0.86rem;
-    }
-    .card-help:hover { color: var(--gold); }
-
-    .mini {
-      width: 72px;
-      height: 72px;
-      border-radius: 12px;
-      background: #101722;
-      border: 1px solid var(--line);
+    .tile-icon svg { width: 22px; height: 22px; display: block; }
+    .tile-tick {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--line-strong);
       display: grid;
-      padding: 6px;
-      gap: 3px;
+      place-items: center;
     }
-    .seq-mini { grid-template-columns: repeat(3, 1fr); }
-    .pat-mini { grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 6px; }
-    .mini i {
-      display: block;
-      border-radius: 3px;
-      background: #243044;
-    }
-    .seq-mini i:nth-child(1) { animation: miniLit 1.8s infinite; }
-    .seq-mini i:nth-child(5) { animation: miniLit 1.8s infinite 0.22s; }
-    .seq-mini i:nth-child(9) { animation: miniLit 1.8s infinite 0.44s; }
-    .seq-mini i:nth-child(6) { animation: miniLit 1.8s infinite 0.66s; }
-    .pat-mini i:nth-child(10) { background: #5ee0c4; }
-    .react-mini {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: reactPreview 2.2s infinite;
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-    }
+    .tile-tick svg { width: 12px; height: 12px; opacity: 0; }
+    .tile.passed .tile-tick { background: var(--gold); border-color: #ffe7a8; }
+    .tile.passed .tile-tick svg { opacity: 1; }
+    .tile-kicker { color: var(--faint); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+    .tile-name { font-weight: 700; letter-spacing: -0.02em; font-size: 1.02rem; line-height: 1.2; }
+    .tile-best { color: var(--gold); font-size: 0.78rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: auto; }
+    .tile-best.none { color: var(--faint); font-weight: 600; }
 
-    .text-btn {
-      align-self: center;
-      min-height: 44px;
-      padding: 0 12px;
-      color: var(--faint);
-      border: 0;
-      background: transparent;
-    }
-    .text-btn:hover { color: var(--fg); }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    /* ---------- Play ---------- */
+    .toolbar { display: flex; align-items: center; gap: 8px; flex: none; }
     .toolbar-title { flex: 1; min-width: 0; }
-    .toolbar-title strong {
-      display: block;
-      font-size: 1.15rem;
-      letter-spacing: -0.03em;
-    }
+    .toolbar-title strong { display: block; font-size: 1.15rem; letter-spacing: -0.03em; line-height: 1.2; }
 
     .hud {
-      width: min(100%, 380px);
-      margin: 0 auto;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 12px;
       color: var(--muted);
       font-variant-numeric: tabular-nums;
       font-size: 0.92rem;
+      flex: none;
+      min-height: 1.6em;
     }
-    .hud b { color: var(--fg); font-weight: 700; }
+    .hud b { color: var(--fg); font-weight: 700; font-size: 1.05rem; margin-left: 4px; }
+    .pips { display: flex; gap: 6px; }
+    .pips i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: block; }
+    .pips i.on { background: var(--gold); border-color: #ffe7a8; }
+
+    .timebar {
+      height: 6px;
+      border-radius: 99px;
+      background: #1a2333;
+      overflow: hidden;
+      flex: none;
+    }
+    .timebar i {
+      display: block;
+      height: 100%;
+      width: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+      transform-origin: left center;
+      transition: transform 60ms linear, background-color 200ms ease;
+    }
+    .timebar.low i { background: var(--bad); }
+    .timebar.off { visibility: hidden; }
 
     .status {
-      margin: 0;
       text-align: center;
       min-height: 1.45em;
       color: var(--muted);
+      flex: none;
     }
 
-    .panel { display: none; width: 100%; flex-direction: column; align-items: center; gap: 12px; }
-    .panel.on { display: flex; }
-
-    .stage { position: relative; width: min(100%, 380px); }
+    .stage {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      container-type: size;
+    }
     .stage::after {
-      content: "";
+      content: "Paused";
       position: absolute;
       inset: 0;
       border-radius: 22px;
       background: #10151d;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      color: var(--faint);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.8rem;
       opacity: 0;
       pointer-events: none;
       transition: opacity 160ms ease;
     }
     .app.is-frozen .stage::after { opacity: 1; }
+    .app.is-frozen .dock.answers { visibility: hidden; }
 
-    .board, .pboard {
-      display: grid;
-      width: 100%;
+    .panel { display: none; }
+    .panel.on { display: grid; }
+
+    .board, .grid4 {
+      width: min(100cqw, 100cqh, 420px);
+      aspect-ratio: 1;
       gap: 10px;
     }
     .board { grid-template-columns: repeat(3, 1fr); }
-    .pboard { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .grid4 { grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
-    .cell, .pcell, .arena {
+    .cell, .pcell, .ncell, .arena {
       border: 1px solid var(--line-strong);
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 46%),
-        #1a2333;
+        var(--surface-2);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 18px rgba(0, 0, 0, 0.28);
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .cell, .pcell {
-      aspect-ratio: 1;
-      width: 100%;
-      border-radius: 18px;
       padding: 0;
     }
-    .cell:hover, .pcell:hover, .arena:hover { border-color: var(--gold); }
-    .cell:active, .pcell:active { transform: scale(0.96); }
+    .cell, .pcell, .ncell { width: 100%; height: 100%; border-radius: 18px; }
+    .pcell, .ncell { border-radius: 14px; }
+    .cell:active, .pcell:active, .ncell:active { transform: scale(0.95); }
     .board.locked .cell { pointer-events: none; }
+    .ncell {
+      font-size: clamp(1.2rem, 7cqw, 1.9rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
+      transition: opacity 180ms ease, transform 120ms ease;
+    }
+    .ncell.used { opacity: 0.16; pointer-events: none; }
 
     .cell.lit {
       background: linear-gradient(180deg, #ffe7a8, #e2ae3a);
       border-color: #ffe7a8;
       box-shadow: 0 0 0 3px rgba(240, 193, 90, 0.28), 0 0 24px rgba(240, 193, 90, 0.45);
     }
-    .cell.good, .pcell.good {
+    .cell.good, .pcell.good, .ncell.good {
       box-shadow: 0 0 0 3px rgba(61, 214, 140, 0.95), 0 0 18px rgba(61, 214, 140, 0.35);
       animation: pop 220ms ease;
     }
-    .cell.bad, .pcell.bad, .arena.is-early {
+    .cell.bad, .pcell.bad, .ncell.bad, .arena.is-early {
       box-shadow: 0 0 0 3px var(--bad);
       animation: shake 280ms ease;
     }
-    .pcell.reveal {
-      box-shadow: 0 0 0 3px var(--gold), 0 0 18px rgba(240, 193, 90, 0.5);
-    }
+    .pcell.reveal { box-shadow: 0 0 0 3px var(--gold), 0 0 18px rgba(240, 193, 90, 0.5); }
 
+    #panel-reaction.on { width: 100%; height: 100%; grid-template-rows: auto 1fr; gap: 12px; }
+    .readout {
+      text-align: center;
+      font-size: clamp(2.4rem, 12vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      min-height: 1em;
+    }
+    .readout span { font-size: 0.4em; letter-spacing: 0; margin-left: 4px; color: var(--muted); font-weight: 700; }
     .arena {
       width: 100%;
-      min-height: 230px;
-      border-radius: 24px;
+      height: 100%;
+      min-height: 160px;
+      border-radius: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -341,9 +390,8 @@
       font-size: clamp(1.6rem, 7vw, 2.4rem);
       font-weight: 800;
       letter-spacing: -0.03em;
-      transition: background-color 70ms linear, color 70ms linear, transform 150ms ease;
+      transition: background-color 60ms linear, color 60ms linear;
     }
-    .arena:active { transform: scale(0.96); }
     .arena.is-wait {
       background: var(--wait);
       color: #fff;
@@ -356,46 +404,112 @@
       border-color: #e7fff6;
       animation: goPulse 160ms ease;
     }
-    .readout {
-      margin: 0;
-      font-size: clamp(2.4rem, 12vw, 3.6rem);
-      font-weight: 800;
-      letter-spacing: -0.05em;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-      min-height: 1em;
-    }
-    .readout span { font-size: 0.4em; letter-spacing: 0; margin-left: 4px; color: var(--muted); font-weight: 700; }
-    .meta { margin: 0; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
 
-    .result {
-      width: min(100%, 380px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
+    #panel-prompt.on { width: 100%; height: 100%; place-items: center; }
+    .prompt {
       text-align: center;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      font-size: clamp(3rem, 22cqw, 5.4rem);
+      font-variant-numeric: tabular-nums;
     }
-    .result p { margin: 0; color: var(--muted); }
+    .prompt.word { text-transform: uppercase; letter-spacing: 0.02em; font-size: clamp(2.6rem, 19cqw, 4.6rem); }
+    .prompt.bad { animation: shake 280ms ease; }
+    .prompt.swap { animation: swap 160ms ease; }
+    .prompt-hint { margin-top: 14px; color: var(--faint); font-size: 0.86rem; text-align: center; }
+
+    .dock { flex: none; display: flex; flex-direction: column; gap: 10px; }
+    .dock.answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .answer {
+      min-height: 68px;
+      border-radius: 18px;
+      border-color: var(--line-strong);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 46%),
+        var(--surface-2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 16px rgba(0, 0, 0, 0.26);
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .answer.wordy { font-size: 1.15rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .answer:active { transform: scale(0.96); border-color: var(--gold); }
 
     .btn {
-      min-height: 48px;
+      min-height: 52px;
       padding: 0 18px;
-      border-radius: 14px;
+      border-radius: 16px;
       background: var(--gold);
       color: var(--ink);
       font-weight: 700;
-      border: 1px solid #ffe1a0;
+      border-color: #ffe1a0;
       box-shadow: 0 8px 20px rgba(240, 193, 90, 0.18);
     }
-    .btn:hover { filter: brightness(1.05); }
+    .btn.big { min-height: 58px; font-size: 1.08rem; width: 100%; }
     .btn.ghost {
       background: transparent;
       color: var(--fg);
       border-color: var(--line-strong);
       box-shadow: none;
     }
+    .btn.danger { background: transparent; color: var(--bad); border-color: rgba(255, 93, 108, 0.5); box-shadow: none; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
+    /* ---------- Result ---------- */
+    .res-top { text-align: center; flex: none; padding-top: 6px; }
+    .res-top strong { display: block; font-size: 1.3rem; letter-spacing: -0.03em; }
+    .res-hero {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-align: center;
+    }
+    .badge {
+      padding: 4px 12px;
+      border-radius: 99px;
+      background: var(--gold);
+      color: var(--ink);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      animation: pop 420ms ease;
+    }
+    .res-value {
+      font-size: clamp(4rem, 26vw, 6.4rem);
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      animation: valueIn 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    }
+    .res-value small { font-size: 0.28em; letter-spacing: 0; color: var(--muted); font-weight: 700; margin-left: 6px; }
+    .res-line { color: var(--muted); }
+    .res-best { color: var(--gold); font-weight: 700; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+    .res-day { display: flex; align-items: center; gap: 14px; padding: 12px 14px; flex: none; }
+    .res-day .crest { width: 64px; height: 64px; }
+    .res-day strong { display: block; letter-spacing: -0.02em; }
+    .res-day p { color: var(--muted); font-size: 0.88rem; }
+    .spark {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--gold);
+      pointer-events: none;
+      animation: spark 900ms ease-out forwards;
+    }
+
+    /* ---------- Sheet ---------- */
     .sheet {
       position: fixed;
       inset: 0;
@@ -404,53 +518,126 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      padding: 16px;
-      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      padding: 12px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
     }
     .sheet-card {
-      width: min(440px, 100%);
+      width: min(456px, 100%);
+      max-height: 100%;
+      overflow-y: auto;
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 22px 20px 16px;
+      border-radius: 24px;
+      padding: 22px 18px 16px;
       box-shadow: var(--shadow);
-      animation: rise 220ms ease;
+      animation: sheetIn 240ms cubic-bezier(0.2, 0.9, 0.3, 1);
     }
     .sheet-card h2 { margin: 0 0 8px; letter-spacing: -0.03em; font-size: 1.3rem; }
     .sheet-card p { margin: 0 0 10px; color: var(--muted); }
     .sheet-card ul { margin: 0 0 16px; padding-left: 1.1rem; color: var(--fg); }
     .sheet-card li { margin: 6px 0; }
-    .sheet-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
-    .sheet-actions .btn { min-width: 120px; }
+    .sheet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sheet-actions.single { grid-template-columns: 1fr; }
+    .setting {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 56px;
+      border-top: 1px solid var(--line);
+    }
+    .setting:first-child { border-top: 0; }
+    .setting span { font-weight: 600; }
+    .setting small { display: block; color: var(--faint); font-weight: 400; }
+    .switch {
+      width: 56px;
+      height: 32px;
+      border-radius: 99px;
+      border-color: var(--line-strong);
+      background: #101722;
+      position: relative;
+      flex: none;
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--faint);
+      transition: transform 160ms ease, background-color 160ms ease;
+    }
+    .switch[aria-pressed="true"] { background: rgba(240, 193, 90, 0.2); border-color: var(--gold); }
+    .switch[aria-pressed="true"]::after { transform: translateX(24px); background: var(--gold); }
+    .sheet-extra { margin: 6px 0 16px; }
+    .sheet-extra .btn { width: 100%; }
 
-    @media (min-width: 800px) {
+    @media (max-height: 640px) {
+      .app { gap: 10px; padding-top: calc(10px + env(safe-area-inset-top)); }
+      .crest { width: 84px; height: 84px; }
+      .tile { min-height: 92px; padding: 10px; }
+      .answer { min-height: 58px; }
+    }
+
+    @media (orientation: landscape) and (max-height: 520px) {
+      .app { width: min(900px, 100%); }
+      #view-play.on { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto 1fr; column-gap: 16px; }
+      #view-play .toolbar { grid-column: 1; }
+      #view-play .hud { grid-column: 1; }
+      #view-play .timebar { grid-column: 1; }
+      #view-play .status { grid-column: 1; align-self: start; }
+      #view-play .stage { grid-column: 2; grid-row: 1 / -1; }
+      #view-play .dock.answers { grid-column: 1; grid-row: 4; align-self: end; }
+    }
+
+    @media (min-width: 800px) and (min-height: 560px) {
       body { display: grid; place-items: center; }
       .app {
         width: min(460px, calc(100vw - 48px));
-        min-height: min(780px, calc(100dvh - 48px));
-        max-height: calc(100dvh - 48px);
-        overflow: auto;
+        height: min(840px, calc(100dvh - 48px));
+        padding: 20px;
         border: 1px solid var(--line);
         border-radius: 28px;
         background: rgba(16, 21, 29, 0.92);
         box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
       }
       .sheet { align-items: center; }
+      .icon-btn:hover, .tile:hover, .answer:hover, .cell:hover, .pcell:hover, .ncell:hover { border-color: var(--gold); }
+      .btn:hover { filter: brightness(1.05); }
     }
 
     @keyframes rise {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: none; }
     }
+    @keyframes sheetIn {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: none; }
+    }
     @keyframes pop {
       0% { transform: scale(1); }
-      45% { transform: scale(0.96); }
+      45% { transform: scale(0.94); }
+      100% { transform: scale(1); }
+    }
+    @keyframes swap {
+      from { opacity: 0; transform: translateY(6px) scale(0.96); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes valueIn {
+      from { opacity: 0; transform: scale(0.7); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes gateIn {
+      0% { transform: scale(0.2); }
+      60% { transform: scale(1.5); }
       100% { transform: scale(1); }
     }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-4px); }
-      40% { transform: translateX(4px); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
       60% { transform: translateX(-3px); }
       80% { transform: translateX(2px); }
     }
@@ -462,13 +649,9 @@
       0%, 100% { box-shadow: inset 0 0 0 0 rgba(255, 255, 255, 0); }
       50% { box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.05); }
     }
-    @keyframes miniLit {
-      0%, 58%, 100% { background: #243044; }
-      10%, 36% { background: #f0c15a; }
-    }
-    @keyframes reactPreview {
-      0%, 45% { background: #9d2e36; color: #fff; }
-      55%, 100% { background: #b6f3df; color: #06281f; }
+    @keyframes spark {
+      from { opacity: 1; transform: translate(-50%, -50%) rotate(0deg); }
+      to { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(220deg); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -482,99 +665,56 @@
 </head>
 <body>
   <div class="app" id="app">
-    <header class="top">
-      <div class="brand">
-        <svg class="mark" viewBox="0 0 42 42" aria-hidden="true">
-          <rect width="42" height="42" rx="14" fill="#141b26" stroke="#3d4e68"/>
-          <circle cx="21" cy="21" r="3.2" fill="#f0c15a"/>
-          <circle cx="21" cy="8.2" r="2.15" fill="#f0c15a"/>
-          <circle cx="32.1" cy="14.5" r="2.15" fill="#f0c15a"/>
-          <circle cx="32.1" cy="27.5" r="2.15" fill="#f0c15a"/>
-          <circle cx="21" cy="33.8" r="2.15" fill="#f0c15a"/>
-          <circle cx="9.9" cy="27.5" r="2.15" fill="#f0c15a"/>
-          <circle cx="9.9" cy="14.5" r="2.15" fill="#f0c15a"/>
-        </svg>
-        <div>
-          <p class="kicker">Rokumon</p>
-          <h1>Brain Trainer</h1>
-        </div>
-      </div>
-      <button type="button" class="icon-btn" id="mute-btn" aria-pressed="false" aria-label="Mute sound">
-        <svg class="when-off" viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 10v4h3l4 3V7L7 10H4z"/><path d="M16 9.5a3.5 3.5 0 010 5"/><path d="M18.2 7.2a6.5 6.5 0 010 9.6"/>
-        </svg>
-        <svg class="when-on" viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 10v4h3l4 3V7L7 10H4z"/><path d="M16 10l4 4M20 10l-4 4"/>
-        </svg>
-      </button>
-    </header>
-
     <section id="view-menu" class="view on">
-      <p class="lede">Three short drills for memory, speed and attention. Bests stay on this device.</p>
-      <div class="cards">
-        <article class="card">
-          <button type="button" class="card-main" data-start="sequence">
-            <span class="card-icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none">
-                <rect x="4" y="4" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/>
-                <rect x="12.75" y="4" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
-                <rect x="21.5" y="4" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
-                <rect x="4" y="12.75" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
-                <rect x="12.75" y="12.75" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/>
-                <rect x="21.5" y="12.75" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
-                <rect x="4" y="21.5" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
-                <rect x="12.75" y="21.5" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/>
-                <rect x="21.5" y="21.5" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/>
-              </svg>
-            </span>
-            <span class="card-copy">
-              <span class="card-name">Sequence</span>
-              <span class="card-desc">Watch a growing path of pads, then repeat it.</span>
-              <span class="card-best" id="best-sequence">Best —</span>
-            </span>
-            <span class="mini seq-mini" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <header class="top">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 42 42" aria-hidden="true">
+            <rect width="42" height="42" rx="14" fill="#141b26" stroke="#3d4e68"/>
+            <circle cx="21" cy="21" r="3.2" fill="#f0c15a"/>
+            <circle cx="21" cy="8.2" r="2.15" fill="#f0c15a"/>
+            <circle cx="32.1" cy="14.5" r="2.15" fill="#f0c15a"/>
+            <circle cx="32.1" cy="27.5" r="2.15" fill="#f0c15a"/>
+            <circle cx="21" cy="33.8" r="2.15" fill="#f0c15a"/>
+            <circle cx="9.9" cy="27.5" r="2.15" fill="#f0c15a"/>
+            <circle cx="9.9" cy="14.5" r="2.15" fill="#f0c15a"/>
+          </svg>
+          <div>
+            <p class="kicker">Rokumon</p>
+            <h1>Brain Trainer</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button type="button" class="icon-btn" id="mute-btn" aria-pressed="false" aria-label="Mute sound">
+            <svg class="when-off" viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 10v4h3l4 3V7L7 10H4z"/><path d="M16 9.5a3.5 3.5 0 010 5"/><path d="M18.2 7.2a6.5 6.5 0 010 9.6"/>
+            </svg>
+            <svg class="when-on" viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 10v4h3l4 3V7L7 10H4z"/><path d="M16 10l4 4M20 10l-4 4"/>
+            </svg>
           </button>
-          <button type="button" class="card-help" data-help="sequence">How to play</button>
-        </article>
+          <button type="button" class="icon-btn" id="settings-btn" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#e7eef8" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+              <path d="M5 7h9M18 7h1M5 12h2M11 12h8M5 17h7M16 17h3"/>
+              <circle cx="16" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="17" r="2"/>
+            </svg>
+          </button>
+        </div>
+      </header>
 
-        <article class="card">
-          <button type="button" class="card-main" data-start="reaction">
-            <span class="card-icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none">
-                <path d="M18 3.5 8.5 18h7.2L13 28.5 24.5 13H16.8L18 3.5z" fill="#f0c15a"/>
-              </svg>
-            </span>
-            <span class="card-copy">
-              <span class="card-name">Reaction</span>
-              <span class="card-desc">Wait for the signal, then tap as fast as you can.</span>
-              <span class="card-best" id="best-reaction">Best —</span>
-            </span>
-            <span class="mini react-mini" aria-hidden="true">TAP</span>
-          </button>
-          <button type="button" class="card-help" data-help="reaction">How to play</button>
-        </article>
-
-        <article class="card">
-          <button type="button" class="card-main" data-start="pattern">
-            <span class="card-icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none">
-                <rect x="4" y="4" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/>
-                <rect x="18" y="4" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/>
-                <rect x="4" y="18" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/>
-                <rect x="18" y="18" width="10" height="10" rx="2" fill="#5ee0c4"/>
-              </svg>
-            </span>
-            <span class="card-copy">
-              <span class="card-name">Pattern</span>
-              <span class="card-desc">Find the one tile whose colour does not match.</span>
-              <span class="card-best" id="best-pattern">Best —</span>
-            </span>
-            <span class="mini pat-mini" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-          </button>
-          <button type="button" class="card-help" data-help="pattern">How to play</button>
-        </article>
+      <div class="card today">
+        <div class="today-row">
+          <div class="crest" id="home-crest" role="img" aria-label="Gates passed today"></div>
+          <div class="today-copy">
+            <p class="kicker">Today</p>
+            <strong id="today-title">0 of 6 gates</strong>
+            <p class="sub" id="today-sub">Pass 3 gates to start a streak.</p>
+            <div class="week" id="week" aria-hidden="true"></div>
+          </div>
+        </div>
+        <button type="button" class="btn big" id="train-btn">Start training</button>
       </div>
-      <button type="button" class="text-btn" id="reset-btn">Reset all bests</button>
+
+      <div class="tiles" id="tiles"></div>
     </section>
 
     <section id="view-play" class="view">
@@ -600,30 +740,60 @@
         </button>
       </div>
 
-      <div id="panel-sequence" class="panel">
-        <p class="status" id="seq-status" aria-live="polite">Watch the path, then repeat it.</p>
-        <div class="hud"><span>Level <b id="seq-level">1</b></span><span>Best <b id="seq-best">—</b></span></div>
-        <div class="stage"><div class="board locked" id="seq-board"></div></div>
-        <div class="result" id="seq-result" hidden>
-          <p id="seq-result-copy"></p>
-          <button type="button" class="btn" id="seq-retry">Try again</button>
+      <div class="hud">
+        <span id="hud-left"></span>
+        <span id="hud-right"></span>
+      </div>
+      <div class="timebar off" id="timebar"><i id="timebar-fill"></i></div>
+      <p class="status" id="status" aria-live="polite"></p>
+
+      <div class="stage">
+        <div id="panel-sequence" class="panel board locked"></div>
+        <div id="panel-reaction" class="panel">
+          <p class="readout" id="react-readout">Ready</p>
+          <button type="button" class="arena" id="react-area">Tap to start</button>
+        </div>
+        <div id="panel-pattern" class="panel grid4"></div>
+        <div id="panel-count" class="panel grid4"></div>
+        <div id="panel-prompt" class="panel">
+          <div>
+            <p class="prompt" id="prompt"></p>
+            <p class="prompt-hint" id="prompt-hint"></p>
+          </div>
         </div>
       </div>
 
-      <div id="panel-reaction" class="panel">
-        <p class="status" id="react-status" aria-live="polite">Tap the panel to arm the round.</p>
-        <p class="readout" id="react-readout">Ready</p>
-        <div class="stage"><button type="button" class="arena" id="react-area">Tap to start</button></div>
-        <p class="meta" id="react-meta">Best — · Avg —</p>
+      <div class="dock answers" id="answers" hidden>
+        <button type="button" class="answer"></button>
+        <button type="button" class="answer"></button>
+        <button type="button" class="answer"></button>
+        <button type="button" class="answer"></button>
       </div>
+    </section>
 
-      <div id="panel-pattern" class="panel">
-        <p class="status" id="pat-status" aria-live="polite">Tap the tile that does not match.</p>
-        <div class="hud"><span>Round <b id="pat-level">1</b></span><span>Best <b id="pat-best">—</b></span></div>
-        <div class="stage"><div class="pboard" id="pat-board"></div></div>
-        <div class="result" id="pat-result" hidden>
-          <p id="pat-result-copy"></p>
-          <button type="button" class="btn" id="pat-retry">Try again</button>
+    <section id="view-result" class="view">
+      <div class="res-top">
+        <p class="kicker" id="res-kicker"></p>
+        <strong id="res-title"></strong>
+      </div>
+      <div class="res-hero" id="res-hero">
+        <p class="badge" id="res-badge" hidden>New best</p>
+        <p class="res-value"><span id="res-value"></span><small id="res-unit"></small></p>
+        <p class="res-line" id="res-line"></p>
+        <p class="res-best" id="res-best"></p>
+      </div>
+      <div class="card res-day">
+        <div class="crest" id="res-crest" aria-hidden="true"></div>
+        <div>
+          <strong id="res-day-title"></strong>
+          <p id="res-day-sub"></p>
+        </div>
+      </div>
+      <div class="dock">
+        <button type="button" class="btn big" id="res-next"></button>
+        <div class="row">
+          <button type="button" class="btn ghost" id="res-again">Play again</button>
+          <button type="button" class="btn ghost" id="res-home">Home</button>
         </div>
       </div>
     </section>
@@ -633,7 +803,7 @@
     <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
       <h2 id="sheet-title">How to play</h2>
       <div id="sheet-body"></div>
-      <div class="sheet-actions">
+      <div class="sheet-actions" id="sheet-actions">
         <button type="button" class="btn ghost" id="sheet-secondary">Close</button>
         <button type="button" class="btn" id="sheet-primary">Play</button>
       </div>
@@ -642,6 +812,9 @@
 
   <script>
     (() => {
+      "use strict";
+
+      /* ---------- Hub bridge ---------- */
       const hubCall = (method, ...args) => {
         try {
           const hub = window.Hub;
@@ -666,11 +839,20 @@
       }, 150);
       setTimeout(() => clearInterval(bootTimer), 3000);
 
-      const MODES = {
+      /* ---------- Drill catalogue ---------- */
+      const ORDER = ["sequence", "reaction", "pattern", "count", "sums", "colour"];
+      const GOAL = 3;
+      const REACT_TRIES = 5;
+      const SUMS_MS = 45000;
+      const COLOUR_MS = 30000;
+
+      const DRILLS = {
         sequence: {
           kicker: "Memory",
           title: "Sequence",
-          summary: "A path of pads lights up. It grows by one each level.",
+          panel: "sequence",
+          icon: '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/><rect x="12.75" y="4" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/><rect x="21.5" y="4" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/><rect x="4" y="12.75" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/><rect x="12.75" y="12.75" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/><rect x="21.5" y="12.75" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/><rect x="4" y="21.5" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/><rect x="12.75" y="21.5" width="6.5" height="6.5" rx="1.6" stroke="#f0c15a" stroke-width="1.4"/><rect x="21.5" y="21.5" width="6.5" height="6.5" rx="1.6" fill="#f0c15a"/></svg>',
+          summary: "A path of pads lights up. It grows by one each level and gets faster.",
           steps: [
             "Watch the whole path. Pads can repeat.",
             "When it goes quiet, tap the pads in the same order.",
@@ -680,44 +862,127 @@
         reaction: {
           kicker: "Speed",
           title: "Reaction",
-          summary: "Arm the round, wait out the red, then hit the mint signal.",
+          panel: "reaction",
+          icon: '<svg viewBox="0 0 32 32" fill="none"><path d="M18 3.5 8.5 18h7.2L13 28.5 24.5 13H16.8L18 3.5z" fill="#f0c15a"/></svg>',
+          summary: "Five tries. Wait out the red, then hit the mint signal.",
           steps: [
-            "Tap the panel to start. It turns red — do not tap yet.",
-            "When it turns mint and says TAP, hit it immediately.",
-            "An early tap is a miss and is not saved. Best and the last five tries stay on this device.",
+            "Tap the panel to arm a try. It turns red. Do not tap yet.",
+            "When it turns mint and says TAP, hit it at once.",
+            "An early tap does not count. After five fair hits you get your average.",
           ],
         },
         pattern: {
           kicker: "Attention",
           title: "Pattern",
-          summary: "One tile is a different colour. The difference gets finer.",
+          panel: "pattern",
+          icon: '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/><rect x="18" y="4" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/><rect x="4" y="18" width="10" height="10" rx="2" stroke="#f0c15a" stroke-width="1.5"/><rect x="18" y="18" width="10" height="10" rx="2" fill="#5ee0c4"/></svg>',
+          summary: "One tile is a different colour. The difference gets finer and the clock gets shorter.",
           steps: [
-            "Scan the grid and tap the odd tile.",
+            "Scan the grid and tap the odd tile before the bar runs out.",
             "Each correct pick starts a closer pair of colours.",
-            "A wrong tile ends the run. Your best is the longest streak.",
+            "A wrong tile or an empty bar ends the run. Your best is the longest streak.",
+          ],
+        },
+        count: {
+          kicker: "Focus",
+          title: "Count",
+          panel: "count",
+          icon: '<svg viewBox="0 0 32 32" fill="none" stroke="#f0c15a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11l3-2v9"/><path d="M14 10.5c0-2 4.5-2 4.5.3 0 2-4.5 4.200-4.500 7.200H19"/><path d="M23 9.500h4l-2.500 3.500c2 0 3 1 3 2.500 0 2.800-4 3.200-5 1.200"/><path d="M6 24h20"/></svg>',
+          summary: "Sixteen numbers in a jumble. Tap them from 1 to 16 as fast as you can.",
+          steps: [
+            "Find 1, then 2, then 3, and so on up to 16.",
+            "A wrong tap adds one second to your time.",
+            "Your best is the fastest clear.",
+          ],
+        },
+        sums: {
+          kicker: "Sums",
+          title: "Quick Sums",
+          panel: "prompt",
+          icon: '<svg viewBox="0 0 32 32" fill="none" stroke="#f0c15a" stroke-width="2.2" stroke-linecap="round"><path d="M6 11h9M10.500 6.500v9"/><path d="M19 9l7 7M26 9l-7 7" stroke-width="1.8"/><path d="M6 21h9M6 26h9"/><path d="M19 23.500h8" /></svg>',
+          summary: "Forty-five seconds of mental arithmetic. Pick the right answer from four.",
+          steps: [
+            "Read the sum and tap the answer.",
+            "A wrong answer costs three seconds.",
+            "The sums get harder as you go. Your best is the most correct answers.",
+          ],
+        },
+        colour: {
+          kicker: "Control",
+          title: "Colour Clash",
+          panel: "prompt",
+          icon: '<svg viewBox="0 0 32 32" fill="none"><path d="M16 4c4 5 8 9 8 14a8 8 0 01-16 0c0-5 4-9 8-14z" fill="#f0c15a"/><path d="M12 19a4 4 0 004 4" stroke="#1a1408" stroke-width="1.8" stroke-linecap="round"/></svg>',
+          summary: "A colour word appears, printed in a different colour. Answer with the colour of the ink, not the word.",
+          steps: [
+            "Ignore what the word says.",
+            "Tap the button that names the colour the word is printed in.",
+            "Thirty seconds. A wrong answer costs two seconds. Your best is the most correct answers.",
           ],
         },
       };
 
+      /* ---------- Elements and storage ---------- */
       const $ = (id) => document.getElementById(id);
       const app = $("app");
-      const viewMenu = $("view-menu");
-      const viewPlay = $("view-play");
+      const views = { menu: $("view-menu"), play: $("view-play"), result: $("view-result") };
       const sheet = $("sheet");
       const sheetTitle = $("sheet-title");
       const sheetBody = $("sheet-body");
+      const sheetActions = $("sheet-actions");
       const sheetPrimary = $("sheet-primary");
       const sheetSecondary = $("sheet-secondary");
       const muteBtn = $("mute-btn");
+      const statusEl = $("status");
+      const hudLeft = $("hud-left");
+      const hudRight = $("hud-right");
+      const timebar = $("timebar");
+      const timebarFill = $("timebar-fill");
+      const answersEl = $("answers");
+      const answerBtns = Array.from(answersEl.querySelectorAll(".answer"));
+      const promptEl = $("prompt");
+      const promptHint = $("prompt-hint");
+
+      const store = {
+        get(key) { try { return localStorage.getItem(key); } catch (err) { return null; } },
+        set(key, value) { try { localStorage.setItem(key, value); } catch (err) { /* storage may be blocked */ } },
+      };
+      const readJSON = (key) => { try { return JSON.parse(store.get(key) || "null"); } catch (err) { return null; } };
 
       let audioCtx = null;
-      let muted = localStorage.getItem("rbt-muted") === "1";
+      let muted = store.get("rbt-muted") === "1";
+      let haptics = store.get("rbt-haptics") !== "0";
       let mode = null;
+      let live = false;
+      let runId = 0;
       let frozen = false;
       let frozenWaiters = [];
       let sheetPrimaryFn = () => {};
       let sheetSecondaryFn = () => closeSheet();
+      let sheetDismissFn = () => closeSheet();
 
+      const rnd = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+      const shuffle = (list) => {
+        for (let i = list.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [list[i], list[j]] = [list[j], list[i]];
+        }
+        return list;
+      };
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      /* Game inputs fire on touch-down, not on finger lift. Keyboard activation still works. */
+      function onTap(el, fn) {
+        el.addEventListener("pointerdown", (event) => {
+          if (event.pointerType === "mouse" && event.button !== 0) return;
+          fn(event);
+        });
+        el.addEventListener("click", (event) => { if (event.detail === 0) fn(event); });
+      }
+      document.addEventListener("contextmenu", (event) => {
+        if (!event.target.closest("input, textarea")) event.preventDefault();
+      });
+
+      /* ---------- Sound and haptics ---------- */
       function unlockAudio() {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
@@ -726,9 +991,6 @@
       }
       document.addEventListener("pointerdown", unlockAudio, { passive: true });
       document.addEventListener("keydown", unlockAudio);
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible" && audioCtx && audioCtx.state === "suspended") audioCtx.resume();
-      });
 
       function tone(freq, dur, type, peak, delay) {
         if (muted || !audioCtx || audioCtx.state !== "running") return;
@@ -748,59 +1010,228 @@
       const PAD_NOTES = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5, 1174.66];
       const sndPad = (i) => tone(PAD_NOTES[i] || 660, 0.18, "sine", 0.1);
       const sndTick = () => tone(988, 0.05, "sine", 0.05);
+      const sndStep = (i) => tone(440 * Math.pow(2, i / 12), 0.07, "triangle", 0.07);
       const sndClear = () => { tone(659, 0.09, "triangle", 0.08, 0); tone(880, 0.14, "sine", 0.08, 0.08); };
       const sndFail = () => { tone(196, 0.22, "sawtooth", 0.045, 0); tone(146, 0.28, "square", 0.03, 0.06); };
       const sndGo = () => { tone(1480, 0.045, "square", 0.04, 0); tone(880, 0.1, "sine", 0.09, 0.02); };
       const sndHit = () => { tone(740, 0.06, "triangle", 0.07, 0); tone(1175, 0.1, "sine", 0.06, 0.05); };
       const sndEarly = () => { tone(210, 0.12, "square", 0.045, 0); tone(170, 0.16, "sawtooth", 0.03, 0.05); };
       const sndPattern = () => tone(720, 0.07, "triangle", 0.07);
+      const sndEnd = () => { tone(523, 0.1, "triangle", 0.07, 0); tone(659, 0.1, "triangle", 0.07, 0.09); tone(784, 0.18, "sine", 0.08, 0.18); };
+      const sndBest = () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.16, "triangle", 0.08, i * 0.09)); tone(1319, 0.3, "sine", 0.08, 0.38); };
+
+      function buzz(pattern) {
+        if (!haptics || !navigator.vibrate) return;
+        if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
+        try { navigator.vibrate(pattern); } catch (err) { /* not supported */ }
+      }
+      const BUZZ = { tap: 8, good: 14, bad: [30, 40, 30], end: [20, 50, 20], best: [20, 40, 20, 40, 60] };
 
       function paintMute() {
         muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
         muteBtn.setAttribute("aria-label", muted ? "Unmute sound" : "Mute sound");
       }
-      paintMute();
-      muteBtn.addEventListener("click", () => {
-        unlockAudio();
-        muted = !muted;
-        localStorage.setItem("rbt-muted", muted ? "1" : "0");
+      function setMuted(next) {
+        muted = next;
+        store.set("rbt-muted", muted ? "1" : "0");
         paintMute();
         if (!muted) sndTick();
-      });
+      }
+      paintMute();
+      muteBtn.addEventListener("click", () => { unlockAudio(); setMuted(!muted); });
 
+      /* ---------- Stats and the daily crest ---------- */
       function loadStats() {
-        try {
-          const raw = JSON.parse(localStorage.getItem("rbt-stats") || "null");
-          if (!raw || typeof raw !== "object") throw new Error("bad");
-          const reacts = Array.isArray(raw.reacts) ? raw.reacts.map(Number).filter((n) => n > 0).slice(-5) : [];
-          return {
-            seq: Number(raw.seq) || 0,
-            react: raw.react == null ? null : (Number(raw.react) || null),
-            pat: Number(raw.pat) || 0,
-            reacts,
-          };
-        } catch (err) {
-          return { seq: 0, react: null, pat: 0, reacts: [] };
-        }
+        const raw = readJSON("rbt-stats");
+        if (!raw || typeof raw !== "object") return { seq: 0, react: null, pat: 0, reacts: [], count: null, sums: 0, colour: 0 };
+        const reacts = Array.isArray(raw.reacts) ? raw.reacts.map(Number).filter((n) => n > 0).slice(-5) : [];
+        return {
+          seq: Number(raw.seq) || 0,
+          react: raw.react == null ? null : (Number(raw.react) || null),
+          pat: Number(raw.pat) || 0,
+          reacts,
+          count: raw.count == null ? null : (Number(raw.count) || null),
+          sums: Number(raw.sums) || 0,
+          colour: Number(raw.colour) || 0,
+        };
       }
       let stats = loadStats();
-      const saveStats = () => {
-        localStorage.setItem("rbt-stats", JSON.stringify(stats));
-        paintBests();
-      };
-      const dash = (n) => (n ? String(n) : "—");
-      function paintBests() {
-        $("best-sequence").textContent = stats.seq ? `Best ${stats.seq}` : "Best —";
-        $("best-reaction").textContent = stats.react ? `Best ${stats.react} ms` : "Best —";
-        $("best-pattern").textContent = stats.pat ? `Best ${stats.pat}` : "Best —";
-        $("seq-best").textContent = dash(stats.seq);
-        $("pat-best").textContent = dash(stats.pat);
-        const avg = stats.reacts.length
-          ? Math.round(stats.reacts.reduce((a, b) => a + b, 0) / stats.reacts.length)
-          : null;
-        $("react-meta").textContent = `Best ${stats.react ? stats.react + " ms" : "—"} · Avg ${avg ? avg + " ms" : "—"}`;
+      const saveStats = () => { store.set("rbt-stats", JSON.stringify(stats)); };
+      const secs = (ms) => (ms / 1000).toFixed(1);
+
+      function bestText(id) {
+        if (id === "sequence") return stats.seq ? "Best level " + stats.seq : "";
+        if (id === "reaction") return stats.react ? "Best " + stats.react + " ms" : "";
+        if (id === "pattern") return stats.pat ? "Best streak " + stats.pat : "";
+        if (id === "count") return stats.count ? "Best " + secs(stats.count) + " s" : "";
+        if (id === "sums") return stats.sums ? "Best " + stats.sums + " correct" : "";
+        return stats.colour ? "Best " + stats.colour + " correct" : "";
       }
-      paintBests();
+
+      const dayKey = (d) => {
+        const date = d || new Date();
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+      };
+      function loadDaily() {
+        const raw = readJSON("rbt-daily");
+        if (raw && raw.days && typeof raw.days === "object") return { days: raw.days };
+        return { days: {} };
+      }
+      let daily = loadDaily();
+      const gatesOn = (key) => (Array.isArray(daily.days[key]) ? daily.days[key].filter((id) => ORDER.includes(id)) : []);
+      const gatesToday = () => gatesOn(dayKey());
+      function streak() {
+        let n = 0;
+        const d = new Date();
+        if (gatesOn(dayKey(d)).length < GOAL) d.setDate(d.getDate() - 1);
+        while (gatesOn(dayKey(d)).length >= GOAL && n < 3660) {
+          n += 1;
+          d.setDate(d.getDate() - 1);
+        }
+        return n;
+      }
+      function markGate(id) {
+        const key = dayKey();
+        const list = gatesOn(key);
+        if (list.includes(id)) return false;
+        list.push(id);
+        daily.days[key] = list;
+        const keep = Object.keys(daily.days).sort().slice(-90);
+        const pruned = {};
+        keep.forEach((k) => { pruned[k] = daily.days[k]; });
+        daily.days = pruned;
+        store.set("rbt-daily", JSON.stringify(daily));
+        hubCall("event", "gate-passed", { gate: ORDER.indexOf(id) + 1, drill: id, today: list.length });
+        if (list.length === ORDER.length) hubCall("event", "crest-complete", { streak: streak() });
+        return true;
+      }
+      const nextGate = () => ORDER.find((id) => !gatesToday().includes(id)) || null;
+
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      function svgEl(name, attrs) {
+        const el = document.createElementNS(SVG_NS, name);
+        Object.keys(attrs).forEach((key) => el.setAttribute(key, attrs[key]));
+        return el;
+      }
+      function paintCrest(host, freshId) {
+        const passed = gatesToday();
+        const svg = svgEl("svg", { viewBox: "0 0 100 100" });
+        const pts = ORDER.map((id, i) => {
+          const a = (-90 + i * 60) * Math.PI / 180;
+          return { id, x: 50 + 36 * Math.cos(a), y: 50 + 36 * Math.sin(a) };
+        });
+        svg.appendChild(svgEl("polygon", { class: "ring", points: pts.map((p) => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ") }));
+        svg.appendChild(svgEl("circle", { class: "core", cx: 50, cy: 50, r: 15 }));
+        const label = svgEl("text", { x: 50, y: 50.5 });
+        label.textContent = String(passed.length);
+        svg.appendChild(label);
+        pts.forEach((p) => {
+          const on = passed.includes(p.id);
+          svg.appendChild(svgEl("circle", {
+            class: "gate" + (on ? " on" : "") + (on && p.id === freshId ? " fresh" : ""),
+            cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: 8,
+          }));
+        });
+        host.classList.toggle("full", passed.length === ORDER.length);
+        host.replaceChildren(svg);
+      }
+
+      function dayCopy() {
+        const done = gatesToday().length;
+        const run = streak();
+        const title = done + " of " + ORDER.length + " gates";
+        let sub;
+        if (done === ORDER.length) sub = "All six gates passed today.";
+        else if (done >= GOAL) sub = "Streak safe. " + (ORDER.length - done) + " more for the full crest.";
+        else if (run > 0) sub = (GOAL - done) + " more to keep your " + run + "-day streak.";
+        else sub = (GOAL - done) + " more to start a streak.";
+        return { done, run, title, sub };
+      }
+
+      /* ---------- Home ---------- */
+      const tilesHost = $("tiles");
+      const tileEls = {};
+      ORDER.forEach((id, i) => {
+        const info = DRILLS[id];
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "tile";
+        btn.innerHTML =
+          '<span class="tile-head"><span class="tile-icon" aria-hidden="true">' + info.icon + "</span>" +
+          '<span class="tile-tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="#1a1408" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.500 6.300 5 8.700 9.500 3.500"/></svg></span></span>' +
+          '<span class="tile-kicker"></span><span class="tile-name"></span><span class="tile-best"></span>';
+        btn.querySelector(".tile-kicker").textContent = "Gate " + (i + 1) + " · " + info.kicker;
+        btn.querySelector(".tile-name").textContent = info.title;
+        btn.addEventListener("click", () => { unlockAudio(); startMode(id); });
+        tilesHost.appendChild(btn);
+        tileEls[id] = btn;
+      });
+
+      function paintHome() {
+        const passed = gatesToday();
+        const copy = dayCopy();
+        paintCrest($("home-crest"));
+        $("today-title").textContent = copy.title;
+        $("today-sub").textContent = copy.sub;
+        const next = nextGate();
+        $("train-btn").textContent = !next
+          ? "Free play: " + DRILLS[ORDER[rnd(0, ORDER.length - 1)]].title
+          : passed.length ? "Next gate: " + DRILLS[next].title : "Start training";
+        $("train-btn").dataset.target = next || "";
+
+        const week = $("week");
+        week.replaceChildren();
+        const names = ["S", "M", "T", "W", "T", "F", "S"];
+        for (let back = 6; back >= 0; back -= 1) {
+          const d = new Date();
+          d.setDate(d.getDate() - back);
+          const n = gatesOn(dayKey(d)).length;
+          const cell = document.createElement("span");
+          cell.className = (n >= GOAL ? "met" : n > 0 ? "some" : "") + (back === 0 ? " now" : "");
+          cell.appendChild(document.createElement("i"));
+          cell.appendChild(document.createTextNode(names[d.getDay()]));
+          week.appendChild(cell);
+        }
+
+        ORDER.forEach((id) => {
+          const el = tileEls[id];
+          const best = bestText(id);
+          const bestEl = el.querySelector(".tile-best");
+          bestEl.textContent = best || "Not played yet";
+          bestEl.classList.toggle("none", !best);
+          el.classList.toggle("passed", passed.includes(id));
+          el.setAttribute("aria-label", DRILLS[id].title + ". " + (best || "Not played yet") + (passed.includes(id) ? ". Passed today" : ""));
+        });
+      }
+
+      $("train-btn").addEventListener("click", () => {
+        unlockAudio();
+        const target = $("train-btn").dataset.target;
+        startMode(target || ORDER[rnd(0, ORDER.length - 1)]);
+      });
+
+      /* ---------- Views, sheet, freeze ---------- */
+      function showView(name) {
+        Object.keys(views).forEach((key) => views[key].classList.toggle("on", key === name));
+      }
+      function showMenu() {
+        stopAll();
+        mode = null;
+        closeSheet();
+        paintHome();
+        showView("menu");
+      }
+      function showPlay(next) {
+        mode = next;
+        const info = DRILLS[next];
+        $("play-kicker").textContent = "Gate " + (ORDER.indexOf(next) + 1) + " · " + info.kicker;
+        $("play-title").textContent = info.title;
+        document.querySelectorAll(".panel").forEach((panel) => panel.classList.remove("on"));
+        $("panel-" + info.panel).classList.add("on");
+        answersEl.hidden = info.panel !== "prompt";
+        setBar(null);
+        showView("play");
+      }
 
       function setFrozen(next) {
         frozen = next;
@@ -816,7 +1247,6 @@
         if (!frozen) return Promise.resolve();
         return new Promise((resolve) => frozenWaiters.push(resolve));
       }
-      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
       function openSheet(opts) {
         sheetTitle.textContent = opts.title;
@@ -835,7 +1265,9 @@
           });
           sheetBody.appendChild(ul);
         }
+        if (opts.build) opts.build(sheetBody);
         sheetPrimary.textContent = opts.primary || "OK";
+        sheetPrimary.className = "btn" + (opts.danger ? " danger" : "");
         sheetPrimaryFn = opts.onPrimary || closeSheet;
         if (opts.secondary) {
           sheetSecondary.hidden = false;
@@ -845,34 +1277,71 @@
           sheetSecondary.hidden = true;
           sheetSecondaryFn = closeSheet;
         }
+        sheetDismissFn = opts.onDismiss || sheetSecondaryFn;
+        sheetActions.classList.toggle("single", !opts.secondary);
         sheet.hidden = false;
-        sheetPrimary.focus();
+        sheetPrimary.focus({ preventScroll: true });
       }
       function closeSheet() {
+        if (sheet.hidden) return;
         sheet.hidden = true;
-        if (sheet.contains(document.activeElement)) muteBtn.focus();
+        if (sheet.contains(document.activeElement)) document.activeElement.blur();
       }
       sheetPrimary.addEventListener("click", () => sheetPrimaryFn());
       sheetSecondary.addEventListener("click", () => sheetSecondaryFn());
-      sheet.addEventListener("click", (event) => {
-        if (event.target === sheet) sheetSecondaryFn();
-      });
+      sheet.addEventListener("click", (event) => { if (event.target === sheet) sheetDismissFn(); });
 
-      function showMenu() {
-        stopAll();
-        mode = null;
-        viewMenu.classList.add("on");
-        viewPlay.classList.remove("on");
-        closeSheet();
+      /* ---------- Shared play helpers ---------- */
+      function setHud(leftLabel, leftValue, rightLabel, rightValue) {
+        const fill = (host, label, value) => {
+          host.replaceChildren();
+          if (label == null) return;
+          host.appendChild(document.createTextNode(label));
+          const b = document.createElement("b");
+          b.textContent = value;
+          host.appendChild(b);
+        };
+        fill(hudLeft, leftLabel, leftValue);
+        fill(hudRight, rightLabel, rightValue);
       }
-      function showPlay(next) {
-        mode = next;
-        viewMenu.classList.remove("on");
-        viewPlay.classList.add("on");
-        $("play-kicker").textContent = MODES[next].kicker;
-        $("play-title").textContent = MODES[next].title;
-        document.querySelectorAll(".panel").forEach((panel) => panel.classList.remove("on"));
-        $("panel-" + next).classList.add("on");
+      function setBar(frac) {
+        if (frac == null) {
+          timebar.classList.add("off");
+          timebar.classList.remove("low");
+          timebarFill.style.transform = "scaleX(1)";
+          return;
+        }
+        const f = Math.max(0, Math.min(1, frac));
+        timebar.classList.remove("off");
+        timebar.classList.toggle("low", f < 0.25);
+        timebarFill.style.transform = "scaleX(" + f.toFixed(3) + ")";
+      }
+
+      /* A clock that stands still while the game is paused. */
+      let clock = null;
+      function stopClock() {
+        if (clock) {
+          clearInterval(clock.timer);
+          clock = null;
+        }
+      }
+      function startClock(opts) {
+        stopClock();
+        const c = { elapsed: 0, last: performance.now(), timer: 0 };
+        c.timer = setInterval(() => {
+          const now = performance.now();
+          const dt = Math.min(150, now - c.last);
+          c.last = now;
+          if (clock !== c) return;
+          if (!frozen) c.elapsed += dt;
+          if (opts.onTick) opts.onTick(c.elapsed);
+          if (clock === c && opts.duration && c.elapsed >= opts.duration) {
+            stopClock();
+            if (opts.onEnd) opts.onEnd();
+          }
+        }, 40);
+        clock = c;
+        return c;
       }
 
       const pulseTimers = new WeakMap();
@@ -893,16 +1362,98 @@
           pulseTimers.set(cell, id);
         });
       }
+      function flash(el, cls) {
+        el.classList.remove("bad", "swap");
+        void el.offsetWidth;
+        el.classList.add(cls);
+      }
 
-      /* ---------- Sequence ---------- */
-      const seqBoard = $("seq-board");
+      function stopAll() {
+        runId += 1;
+        live = false;
+        stopClock();
+        clearReactTimer();
+        inputOk = false;
+        answerFn = null;
+        setFrozen(false);
+        seqBoard.classList.add("locked");
+      }
+
+      /* ---------- Result ---------- */
+      function burst() {
+        const hero = $("res-hero");
+        hero.querySelectorAll(".spark").forEach((el) => el.remove());
+        const colours = ["#f0c15a", "#ffe7a8", "#5ee0c4", "#e7eef8"];
+        for (let i = 0; i < 18; i += 1) {
+          const s = document.createElement("i");
+          s.className = "spark";
+          const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.4;
+          const dist = 90 + Math.random() * 80;
+          s.style.setProperty("--dx", Math.round(Math.cos(angle) * dist) + "px");
+          s.style.setProperty("--dy", Math.round(Math.sin(angle) * dist) + "px");
+          s.style.background = colours[i % colours.length];
+          s.style.animationDelay = Math.round(Math.random() * 120) + "ms";
+          hero.appendChild(s);
+        }
+        setTimeout(() => hero.querySelectorAll(".spark").forEach((el) => el.remove()), 1300);
+      }
+
+      function finish(id, res) {
+        const info = DRILLS[id];
+        live = false;
+        stopClock();
+        saveStats();
+        const fresh = markGate(id);
+        const copy = dayCopy();
+
+        $("res-kicker").textContent = "Gate " + (ORDER.indexOf(id) + 1) + " · " + info.kicker;
+        $("res-title").textContent = info.title;
+        $("res-value").textContent = res.value;
+        $("res-unit").textContent = res.unit || "";
+        $("res-line").textContent = res.line;
+        $("res-badge").hidden = !res.isBest;
+        $("res-best").textContent = res.isBest ? "" : bestText(id);
+        paintCrest($("res-crest"), fresh ? id : null);
+        $("res-day-title").textContent = fresh ? "Gate passed. " + copy.title + " today" : copy.title + " today";
+        $("res-day-sub").textContent = copy.sub;
+
+        const next = nextGate();
+        const nextBtn = $("res-next");
+        nextBtn.textContent = next ? "Next gate: " + DRILLS[next].title : "Back to home";
+        nextBtn.dataset.target = next || "";
+        $("res-again").dataset.target = id;
+
+        mode = null;
+        showView("result");
+        const value = $("res-value").parentElement;
+        value.style.animation = "none";
+        void value.offsetWidth;
+        value.style.animation = "";
+        if (res.isBest) {
+          sndBest();
+          buzz(BUZZ.best);
+          burst();
+        } else {
+          sndEnd();
+          buzz(BUZZ.end);
+        }
+      }
+      $("res-next").addEventListener("click", () => {
+        const target = $("res-next").dataset.target;
+        if (target) startMode(target); else showMenu();
+      });
+      $("res-again").addEventListener("click", () => startMode($("res-again").dataset.target));
+      $("res-home").addEventListener("click", showMenu);
+
+      /* ---------- Gate 1: Sequence ---------- */
+      const seqBoard = $("panel-sequence");
       const seqCells = [];
       for (let i = 0; i < 9; i += 1) {
         const cell = document.createElement("button");
         cell.type = "button";
         cell.className = "cell";
         cell.setAttribute("aria-label", "Pad " + (i + 1));
-        cell.addEventListener("click", () => seqClick(i));
+        onTap(cell, () => seqClick(i));
         seqBoard.appendChild(cell);
         seqCells.push(cell);
       }
@@ -910,110 +1461,132 @@
       let pIdx = 0;
       let level = 1;
       let inputOk = false;
-      let seqLive = false;
-      let seqToken = 0;
+      let seqBestAtStart = 0;
 
       function setSeqHud() {
-        $("seq-level").textContent = String(level);
-        $("seq-best").textContent = dash(stats.seq);
+        setHud("Level", String(level), "Best", stats.seq ? String(stats.seq) : "-");
       }
-      function clearSeqRun() {
+      function beginSequence() {
+        showPlay("sequence");
         seq = [];
         pIdx = 0;
         level = 1;
         inputOk = false;
+        seqBestAtStart = stats.seq;
         seqBoard.classList.add("locked");
         seqCells.forEach((cell) => cell.classList.remove("lit", "good", "bad"));
-        $("seq-result").hidden = true;
-      }
-      function beginSequence() {
-        unlockAudio();
-        stopAll();
-        showPlay("sequence");
-        clearSeqRun();
-        seqLive = true;
-        const token = seqToken;
-        hubCall("ready");
-        $("seq-status").textContent = "Watch carefully";
+        live = true;
+        const token = runId;
+        statusEl.textContent = "Watch carefully";
         setSeqHud();
         setTimeout(() => { nextSeq(token); }, 420);
       }
       async function nextSeq(token) {
-        if (token !== seqToken) return;
+        if (token !== runId) return;
         await waitWhileFrozen();
-        if (token !== seqToken) return;
+        if (token !== runId) return;
         seq.push(Math.floor(Math.random() * 9));
         level = seq.length;
-        setSeqHud();
         if (level > stats.seq) {
           stats.seq = level;
           saveStats();
           hubCall("score", level);
         }
-        $("seq-status").textContent = "Watch";
+        setSeqHud();
+        statusEl.textContent = "Watch";
         await sleep(460);
-        if (token !== seqToken) return;
+        if (token !== runId) return;
         await waitWhileFrozen();
-        if (token !== seqToken) return;
+        if (token !== runId) return;
         playSeq(token);
       }
       async function playSeq(token) {
         inputOk = false;
         seqBoard.classList.add("locked");
+        const litMs = Math.max(230, 430 - seq.length * 14);
+        const gapMs = Math.max(80, 140 - seq.length * 4);
         for (let step = 0; step < seq.length; step += 1) {
-          if (token !== seqToken) return;
+          if (token !== runId) return;
           await waitWhileFrozen();
-          if (token !== seqToken) return;
+          if (token !== runId) return;
           const index = seq[step];
-          $("seq-status").textContent = "Watch " + (step + 1) + " / " + seq.length;
+          statusEl.textContent = "Watch " + (step + 1) + " / " + seq.length;
           sndPad(index);
-          await pulse(seqCells[index], "lit", 420);
-          if (token !== seqToken) return;
-          await sleep(130);
+          await pulse(seqCells[index], "lit", litMs);
+          if (token !== runId) return;
+          await sleep(gapMs);
         }
-        if (token !== seqToken) return;
+        if (token !== runId) return;
         pIdx = 0;
         inputOk = true;
         seqBoard.classList.remove("locked");
-        $("seq-status").textContent = "Your turn · 0 / " + seq.length;
+        statusEl.textContent = "Your turn · 0 / " + seq.length;
       }
       function seqClick(i) {
-        if (!inputOk || frozen) return;
-        const token = seqToken;
+        if (!inputOk || frozen || mode !== "sequence") return;
+        const token = runId;
         if (i === seq[pIdx]) {
-          sndTick();
+          sndPad(i);
+          buzz(BUZZ.tap);
           pulse(seqCells[i], "good", 180);
           pIdx += 1;
-          $("seq-status").textContent = "Your turn · " + pIdx + " / " + seq.length;
+          statusEl.textContent = "Your turn · " + pIdx + " / " + seq.length;
           if (pIdx === seq.length) {
             inputOk = false;
             seqBoard.classList.add("locked");
             sndClear();
-            $("seq-status").textContent = "Correct";
+            buzz(BUZZ.good);
+            statusEl.textContent = "Correct";
             hubCall("event", "sequence-completed", { level });
             setTimeout(() => nextSeq(token), 520);
           }
         } else {
           inputOk = false;
-          seqLive = false;
+          live = false;
           seqBoard.classList.add("locked");
           sndFail();
+          buzz(BUZZ.bad);
           pulse(seqCells[i], "bad", 380);
-          $("seq-status").textContent = "Missed";
-          $("seq-result-copy").textContent = "Reached level " + level + ". Best is " + stats.seq + ".";
-          $("seq-result").hidden = false;
+          pulse(seqCells[seq[pIdx]], "lit", 700);
+          statusEl.textContent = "Missed";
           hubCall("gameOver", stats.seq, 0);
+          const reached = level;
+          setTimeout(() => {
+            if (token !== runId) return;
+            finish("sequence", {
+              value: String(reached),
+              line: reached === 1 ? "Level reached" : "Level reached, a path of " + reached,
+              isBest: reached > 1 && reached > seqBestAtStart,
+            });
+          }, 850);
         }
       }
 
-      /* ---------- Reaction ---------- */
+      /* ---------- Gate 2: Reaction ---------- */
       const arena = $("react-area");
       const readout = $("react-readout");
       let reactState = "idle";
       let reactEpoch = 0;
       let reactTimer = 0;
       let reactStart = 0;
+      let reactTries = [];
+      let reactBestAtStart = null;
 
+      function paintReactHud() {
+        hudLeft.replaceChildren();
+        const pips = document.createElement("span");
+        pips.className = "pips";
+        for (let i = 0; i < REACT_TRIES; i += 1) {
+          const dot = document.createElement("i");
+          if (i < reactTries.length) dot.className = "on";
+          pips.appendChild(dot);
+        }
+        hudLeft.appendChild(pips);
+        hudRight.replaceChildren(document.createTextNode("Best"));
+        const b = document.createElement("b");
+        b.textContent = stats.react ? stats.react + " ms" : "-";
+        hudRight.appendChild(b);
+      }
       function paintReaction(state, label, readoutText) {
         reactState = state;
         arena.classList.remove("is-wait", "is-go", "is-early");
@@ -1028,41 +1601,44 @@
         reactTimer = 0;
       }
       function beginReaction() {
-        unlockAudio();
-        stopAll();
         showPlay("reaction");
         reactEpoch += 1;
+        reactTries = [];
+        reactBestAtStart = stats.react;
+        live = true;
         paintReaction("idle", "Tap to start", "Ready");
-        $("react-status").textContent = "Tap the panel to arm the round.";
-        arena.focus();
+        paintReactHud();
+        statusEl.textContent = "Five tries. Tap the panel to arm the first.";
       }
       function armReaction() {
-        unlockAudio();
         const epoch = ++reactEpoch;
         paintReaction("waiting", "Wait", "Hold");
-        $("react-status").textContent = "Wait for mint.";
-        const delay = 800 + Math.random() * 2200;
+        statusEl.textContent = "Wait for mint.";
+        const delay = 900 + Math.random() * 2300;
         clearReactTimer();
         reactTimer = setTimeout(() => {
           if (epoch !== reactEpoch || frozen) return;
           paintReaction("go", "TAP", "Now");
-          $("react-status").textContent = "Tap now.";
+          statusEl.textContent = "Tap now.";
           sndGo();
           reactStart = performance.now();
+          /* Start the clock from the frame that shows the signal, where the browser allows it. */
+          requestAnimationFrame(() => { if (epoch === reactEpoch && reactState === "go") reactStart = performance.now(); });
         }, delay);
       }
       function finishReaction(ms) {
+        const token = runId;
         reactEpoch += 1;
         clearReactTimer();
         reactState = "done";
         arena.classList.remove("is-wait", "is-go", "is-early");
-        arena.textContent = "Tap to try again";
         readout.replaceChildren(document.createTextNode(String(ms)));
         const unit = document.createElement("span");
         unit.textContent = "ms";
         readout.appendChild(unit);
-        $("react-status").textContent = ms < 220 ? "Sharp." : ms < 320 ? "Clean." : "Room to tighten.";
         sndHit();
+        buzz(BUZZ.good);
+        reactTries.push(ms);
         stats.reacts.push(ms);
         if (stats.reacts.length > 5) stats.reacts.shift();
         if (!stats.react || ms < stats.react) {
@@ -1072,11 +1648,31 @@
         }
         saveStats();
         hubCall("event", "reaction-completed", { ms });
+        paintReactHud();
+        if (reactTries.length >= REACT_TRIES) {
+          reactState = "locked";
+          arena.textContent = "Done";
+          statusEl.textContent = "Set complete.";
+          const avg = Math.round(reactTries.reduce((a, b) => a + b, 0) / reactTries.length);
+          const fastest = Math.min(...reactTries);
+          setTimeout(() => {
+            if (token !== runId) return;
+            finish("reaction", {
+              value: String(avg),
+              unit: "ms",
+              line: "Average of five. Fastest " + fastest + " ms",
+              isBest: reactBestAtStart == null || fastest < reactBestAtStart,
+            });
+          }, 750);
+          return;
+        }
+        arena.textContent = "Tap for try " + (reactTries.length + 1);
+        statusEl.textContent = ms < 220 ? "Sharp." : ms < 320 ? "Clean." : "Room to tighten.";
       }
-      arena.addEventListener("click", () => {
+      onTap(arena, () => {
         if (mode !== "reaction" || frozen) return;
-        unlockAudio();
         if (reactState === "idle" || reactState === "done" || reactState === "early") {
+          buzz(BUZZ.tap);
           armReaction();
           return;
         }
@@ -1084,31 +1680,30 @@
           reactEpoch += 1;
           clearReactTimer();
           paintReaction("early", "Too soon", "Early");
-          $("react-status").textContent = "That one does not count. Tap to arm again.";
+          statusEl.textContent = "That one does not count. Tap to arm again.";
           sndEarly();
+          buzz(BUZZ.bad);
           return;
         }
-        if (reactState === "go") {
-          finishReaction(Math.round(performance.now() - reactStart));
-        }
+        if (reactState === "go") finishReaction(Math.max(1, Math.round(performance.now() - reactStart)));
       });
 
-      /* ---------- Pattern ---------- */
-      const patBoard = $("pat-board");
+      /* ---------- Gate 3: Pattern ---------- */
+      const patBoard = $("panel-pattern");
       const patCells = [];
       for (let i = 0; i < 16; i += 1) {
         const cell = document.createElement("button");
         cell.type = "button";
         cell.className = "pcell";
         cell.setAttribute("aria-label", "Tile " + (i + 1));
-        cell.addEventListener("click", () => patClick(i));
+        onTap(cell, () => patClick(i));
         patBoard.appendChild(cell);
         patCells.push(cell);
       }
       let patRound = 1;
-      let patLive = false;
-      let patToken = 0;
+      let patOpen = false;
       let oddIndex = -1;
+      let patBestAtStart = 0;
 
       function colorsForRound(round) {
         const base = { h: 214, s: 18, l: 28 };
@@ -1122,173 +1717,519 @@
         const hsl = (c) => "hsl(" + c.h.toFixed(1) + " " + c.s.toFixed(1) + "% " + c.l.toFixed(1) + "%)";
         return { base: hsl(base), odd: hsl(odd) };
       }
-      function paintPattern() {
+      function dealPattern() {
+        oddIndex = Math.floor(Math.random() * 16);
         const colors = colorsForRound(patRound);
         patCells.forEach((cell, i) => {
           cell.style.background = i === oddIndex ? colors.odd : colors.base;
           cell.classList.remove("good", "bad", "reveal");
         });
-        $("pat-level").textContent = String(patRound);
-      }
-      function dealPattern() {
-        oddIndex = Math.floor(Math.random() * 16);
-        paintPattern();
-        $("pat-status").textContent = "Find the different colour.";
+        setHud("Round", String(patRound), "Best", stats.pat ? String(stats.pat) : "-");
+        statusEl.textContent = "Find the different colour.";
+        patOpen = true;
+        const limit = Math.max(2500, 6000 - (patRound - 1) * 250);
+        setBar(1);
+        startClock({
+          duration: limit,
+          onTick: (elapsed) => setBar(1 - elapsed / limit),
+          onEnd: () => patFail(-1),
+        });
       }
       function beginPattern() {
-        unlockAudio();
-        stopAll();
         showPlay("pattern");
-        patToken += 1;
         patRound = 1;
-        patLive = true;
-        $("pat-result").hidden = true;
-        hubCall("ready");
+        patBestAtStart = stats.pat;
+        live = true;
         dealPattern();
       }
+      function patFail(i) {
+        const token = runId;
+        patOpen = false;
+        live = false;
+        stopClock();
+        sndFail();
+        buzz(BUZZ.bad);
+        if (i >= 0) pulse(patCells[i], "bad", 360);
+        patCells[oddIndex].classList.add("reveal");
+        const cleared = Math.max(0, patRound - 1);
+        statusEl.textContent = i >= 0 ? "Missed" : "Out of time";
+        hubCall("gameOver", stats.pat, 0);
+        setTimeout(() => {
+          if (token !== runId) return;
+          finish("pattern", {
+            value: String(cleared),
+            line: cleared === 1 ? "Tile found in a row" : "Tiles found in a row",
+            isBest: cleared > patBestAtStart,
+          });
+        }, 950);
+      }
       function patClick(i) {
-        if (!patLive || frozen || mode !== "pattern") return;
-        if (i === oddIndex) {
-          sndPattern();
-          pulse(patCells[i], "good", 160);
-          const cleared = patRound;
-          patRound += 1;
-          if (cleared > stats.pat) {
-            stats.pat = cleared;
-            saveStats();
-            hubCall("score", stats.pat);
-          }
-          hubCall("event", "pattern-correct", { round: cleared });
-          patLive = false;
-          const token = patToken;
-          setTimeout(() => {
-            if (token !== patToken || mode !== "pattern") return;
-            patLive = true;
-            dealPattern();
-          }, 150);
+        if (!patOpen || frozen || mode !== "pattern") return;
+        if (i !== oddIndex) { patFail(i); return; }
+        patOpen = false;
+        stopClock();
+        sndPattern();
+        buzz(BUZZ.tap);
+        pulse(patCells[i], "good", 160);
+        const cleared = patRound;
+        patRound += 1;
+        if (cleared > stats.pat) {
+          stats.pat = cleared;
+          saveStats();
+          hubCall("score", stats.pat);
+        }
+        hubCall("event", "pattern-correct", { round: cleared });
+        const token = runId;
+        setTimeout(() => {
+          if (token !== runId || mode !== "pattern") return;
+          dealPattern();
+        }, 150);
+      }
+
+      /* ---------- Gate 4: Count ---------- */
+      const countBoard = $("panel-count");
+      const countCells = [];
+      for (let i = 0; i < 16; i += 1) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "ncell";
+        onTap(cell, () => countClick(i));
+        countBoard.appendChild(cell);
+        countCells.push(cell);
+      }
+      let countNums = [];
+      let countNext = 1;
+      let countOpen = false;
+
+      function paintCountHud(ms) {
+        setHud("Next", countNext > 16 ? "-" : String(countNext), "Time", secs(ms) + " s");
+      }
+      function beginCount() {
+        showPlay("count");
+        countNext = 1;
+        countOpen = false;
+        live = true;
+        countCells.forEach((cell) => {
+          cell.textContent = "";
+          cell.classList.remove("used", "good", "bad");
+          cell.removeAttribute("aria-label");
+        });
+        paintCountHud(0);
+        statusEl.textContent = "Get ready";
+        const token = runId;
+        setTimeout(async () => {
+          if (token !== runId) return;
+          await waitWhileFrozen();
+          if (token !== runId) return;
+          countNums = shuffle(Array.from({ length: 16 }, (_, n) => n + 1));
+          countCells.forEach((cell, i) => {
+            cell.textContent = String(countNums[i]);
+            cell.setAttribute("aria-label", "Number " + countNums[i]);
+          });
+          statusEl.textContent = "Tap 1 to 16 in order.";
+          countOpen = true;
+          startClock({ onTick: (elapsed) => paintCountHud(elapsed) });
+        }, 700);
+      }
+      function countClick(i) {
+        if (!countOpen || frozen || mode !== "count" || !clock) return;
+        const cell = countCells[i];
+        if (countNums[i] !== countNext) {
+          clock.elapsed += 1000;
+          sndEarly();
+          buzz(BUZZ.bad);
+          pulse(cell, "bad", 300);
+          statusEl.textContent = "Plus one second. Look for " + countNext + ".";
+          return;
+        }
+        sndStep(countNext - 1);
+        buzz(BUZZ.tap);
+        cell.classList.add("used");
+        countNext += 1;
+        if (countNext <= 16) {
+          paintCountHud(clock.elapsed);
+          statusEl.textContent = "Tap 1 to 16 in order.";
+          return;
+        }
+        const ms = Math.round(clock.elapsed);
+        const token = runId;
+        countOpen = false;
+        stopClock();
+        paintCountHud(ms);
+        statusEl.textContent = "Cleared";
+        const isBest = !stats.count || ms < stats.count;
+        if (isBest) {
+          stats.count = ms;
+          saveStats();
+          hubCall("score", Math.max(0, 600 - Math.round(ms / 100)));
+        }
+        hubCall("event", "count-completed", { ms });
+        setTimeout(() => {
+          if (token !== runId) return;
+          finish("count", { value: secs(ms), unit: "s", line: "To clear 1 to 16", isBest });
+        }, 450);
+      }
+
+      /* ---------- Answer dock, shared by Sums and Colour ---------- */
+      let answerFn = null;
+      answerBtns.forEach((btn, i) => onTap(btn, () => { if (answerFn && !frozen) answerFn(i); }));
+      function setAnswers(labels, wordy) {
+        answerBtns.forEach((btn, i) => {
+          btn.textContent = labels[i];
+          btn.classList.toggle("wordy", Boolean(wordy));
+        });
+      }
+      function beginSprint(id, duration, onReady) {
+        showPlay(id);
+        live = true;
+        answerFn = null;
+        promptEl.textContent = "";
+        promptEl.style.color = "";
+        promptEl.classList.toggle("word", id === "colour");
+        promptHint.textContent = "";
+        setAnswers(["", "", "", ""], id === "colour");
+        setBar(1);
+        statusEl.textContent = "Get ready";
+        const token = runId;
+        setTimeout(async () => {
+          if (token !== runId) return;
+          await waitWhileFrozen();
+          if (token !== runId) return;
+          onReady(token);
+        }, 700);
+      }
+
+      /* ---------- Gate 5: Quick Sums ---------- */
+      let sumScore = 0;
+      let sumAnswer = 0;
+      let sumOptions = [];
+      let sumLast = "";
+
+      function makeSum(n) {
+        const tier = n < 5 ? 0 : n < 12 ? 1 : n < 20 ? 2 : 3;
+        const ops = tier === 0 ? ["+", "+", "−"] : tier === 1 ? ["+", "−", "×"] : ["+", "−", "×", "×"];
+        const op = ops[rnd(0, ops.length - 1)];
+        let a;
+        let b;
+        let ans;
+        if (op === "×") {
+          a = tier < 2 ? rnd(2, 6) : rnd(3, tier === 2 ? 9 : 12);
+          b = rnd(2, 9);
+          ans = a * b;
         } else {
-          patLive = false;
-          sndFail();
-          pulse(patCells[i], "bad", 360);
-          patCells[oddIndex].classList.add("reveal");
-          const cleared = Math.max(0, patRound - 1);
-          $("pat-status").textContent = "Missed";
-          $("pat-result-copy").textContent = "Cleared " + cleared + ". Best is " + stats.pat + ".";
-          $("pat-result").hidden = false;
-          hubCall("gameOver", stats.pat, 0);
+          const hi = [9, 20, 50, 99][tier];
+          a = rnd(tier === 0 ? 2 : 6, hi);
+          b = rnd(2, tier === 0 ? 9 : Math.max(9, Math.floor(hi / 2)));
+          if (op === "−" && b > a) [a, b] = [b, a];
+          ans = op === "+" ? a + b : a - b;
         }
-      }
-
-      function stopAll() {
-        seqToken += 1;
-        seqLive = false;
-        reactEpoch += 1;
-        patToken += 1;
-        clearReactTimer();
-        inputOk = false;
-        patLive = false;
-        setFrozen(false);
-        seqBoard.classList.add("locked");
-      }
-
-      function openHelp(which, fromPlay) {
-        const info = MODES[which];
-        const reactionLive = fromPlay && mode === "reaction" && (reactState === "waiting" || reactState === "go");
-        const wasLive = fromPlay && (seqLive || patLive || reactionLive);
-        if (wasLive) {
-          setFrozen(true);
-          if (reactionLive) {
-            reactEpoch += 1;
-            clearReactTimer();
-            paintReaction("idle", "Tap to start", "Ready");
-            $("react-status").textContent = "Round reset. Tap to arm again.";
-          }
+        const text = a + " " + op + " " + b;
+        const pool = new Set();
+        const deltas = shuffle([1, -1, 2, -2, 10, -10, 3, -3, op === "×" ? a : 5, op === "×" ? -b : -5]);
+        for (const d of deltas) {
+          if (pool.size >= 3) break;
+          const v = ans + d;
+          if (v >= 0 && v !== ans) pool.add(v);
         }
-        openSheet({
-          title: info.title,
-          paragraphs: [info.summary],
-          steps: info.steps,
-          primary: fromPlay ? "Resume" : "Play",
-          secondary: "Close",
-          onPrimary: () => {
-            closeSheet();
-            if (fromPlay) {
-              setFrozen(false);
-              return;
+        let pad = 4;
+        while (pool.size < 3) { pool.add(ans + pad); pad += 1; }
+        return { text, ans, options: shuffle([ans, ...pool]) };
+      }
+      function dealSum() {
+        let q = makeSum(sumScore);
+        for (let tries = 0; tries < 6 && q.text === sumLast; tries += 1) q = makeSum(sumScore);
+        sumLast = q.text;
+        sumAnswer = q.ans;
+        sumOptions = q.options;
+        promptEl.textContent = q.text;
+        flash(promptEl, "swap");
+        setAnswers(sumOptions.map(String), false);
+        setHud("Correct", String(sumScore), "Best", stats.sums ? String(stats.sums) : "-");
+      }
+      function beginSums() {
+        sumScore = 0;
+        sumLast = "";
+        setHud("Correct", "0", "Best", stats.sums ? String(stats.sums) : "-");
+        beginSprint("sums", SUMS_MS, (token) => {
+          statusEl.textContent = "Pick the answer.";
+          dealSum();
+          answerFn = (i) => {
+            if (mode !== "sums" || !clock) return;
+            if (sumOptions[i] === sumAnswer) {
+              sumScore += 1;
+              sndTick();
+              buzz(BUZZ.tap);
+              statusEl.textContent = "Pick the answer.";
+            } else {
+              clock.elapsed += 3000;
+              sndEarly();
+              buzz(BUZZ.bad);
+              statusEl.textContent = "Minus three seconds.";
+              flash(promptEl, "bad");
             }
-            startMode(which);
-          },
-          onSecondary: () => {
-            closeSheet();
-            if (wasLive) setFrozen(false);
-          },
+            dealSum();
+          };
+          startClock({
+            duration: SUMS_MS,
+            onTick: (elapsed) => setBar(1 - elapsed / SUMS_MS),
+            onEnd: () => {
+              if (token !== runId) return;
+              answerFn = null;
+              const isBest = sumScore > stats.sums;
+              if (isBest) {
+                stats.sums = sumScore;
+                saveStats();
+                hubCall("score", sumScore);
+              }
+              hubCall("event", "sums-completed", { correct: sumScore });
+              hubCall("gameOver", stats.sums, 0);
+              finish("sums", { value: String(sumScore), line: sumScore === 1 ? "Correct answer in 45 seconds" : "Correct answers in 45 seconds", isBest });
+            },
+          });
         });
       }
 
-      function startMode(which) {
+      /* ---------- Gate 6: Colour Clash ---------- */
+      const INKS = [
+        { name: "Red", hex: "#ff5d6c" },
+        { name: "Blue", hex: "#5aa9ff" },
+        { name: "Green", hex: "#3dd68c" },
+        { name: "Gold", hex: "#f0c15a" },
+      ];
+      let colourScore = 0;
+      let colourInk = 0;
+      let colourLast = "";
+
+      function dealColour() {
+        let word;
+        let ink;
+        do {
+          word = rnd(0, 3);
+          ink = Math.random() < 0.2 ? word : (word + rnd(1, 3)) % 4;
+        } while (word + "-" + ink === colourLast);
+        colourLast = word + "-" + ink;
+        colourInk = ink;
+        promptEl.textContent = INKS[word].name;
+        promptEl.style.color = INKS[ink].hex;
+        flash(promptEl, "swap");
+        setHud("Correct", String(colourScore), "Best", stats.colour ? String(stats.colour) : "-");
+      }
+      function beginColour() {
+        colourScore = 0;
+        colourLast = "";
+        setHud("Correct", "0", "Best", stats.colour ? String(stats.colour) : "-");
+        beginSprint("colour", COLOUR_MS, (token) => {
+          statusEl.textContent = "Which colour is the ink?";
+          promptHint.textContent = "Answer with the ink colour, not the word.";
+          setAnswers(INKS.map((c) => c.name), true);
+          dealColour();
+          answerFn = (i) => {
+            if (mode !== "colour" || !clock) return;
+            if (i === colourInk) {
+              colourScore += 1;
+              sndTick();
+              buzz(BUZZ.tap);
+              statusEl.textContent = "Which colour is the ink?";
+            } else {
+              clock.elapsed += 2000;
+              sndEarly();
+              buzz(BUZZ.bad);
+              statusEl.textContent = "Minus two seconds.";
+              flash(promptEl, "bad");
+            }
+            dealColour();
+          };
+          startClock({
+            duration: COLOUR_MS,
+            onTick: (elapsed) => setBar(1 - elapsed / COLOUR_MS),
+            onEnd: () => {
+              if (token !== runId) return;
+              answerFn = null;
+              promptEl.style.color = "";
+              const isBest = colourScore > stats.colour;
+              if (isBest) {
+                stats.colour = colourScore;
+                saveStats();
+                hubCall("score", colourScore);
+              }
+              hubCall("event", "colour-completed", { correct: colourScore });
+              hubCall("gameOver", stats.colour, 0);
+              finish("colour", { value: String(colourScore), line: colourScore === 1 ? "Correct answer in 30 seconds" : "Correct answers in 30 seconds", isBest });
+            },
+          });
+        });
+      }
+
+      /* ---------- Starting, help, pause, settings ---------- */
+      const BEGIN = {
+        sequence: beginSequence,
+        reaction: beginReaction,
+        pattern: beginPattern,
+        count: beginCount,
+        sums: beginSums,
+        colour: beginColour,
+      };
+      function loadSeen() {
+        const raw = readJSON("rbt-seen");
+        return Array.isArray(raw) ? raw.filter((id) => ORDER.includes(id)) : [];
+      }
+      let seen = loadSeen();
+
+      function launch(which) {
         closeSheet();
-        setFrozen(false);
-        if (which === "sequence") beginSequence();
-        else if (which === "reaction") beginReaction();
-        else beginPattern();
+        unlockAudio();
+        stopAll();
+        hubCall("ready");
+        BEGIN[which]();
+      }
+      function startMode(which) {
+        if (!BEGIN[which]) return;
+        if (!seen.includes(which)) {
+          seen.push(which);
+          store.set("rbt-seen", JSON.stringify(seen));
+          const info = DRILLS[which];
+          stopAll();
+          openSheet({
+            title: info.title,
+            paragraphs: [info.summary],
+            steps: info.steps,
+            primary: "Play",
+            secondary: "Back",
+            onPrimary: () => launch(which),
+            onSecondary: () => { closeSheet(); if (!views.menu.classList.contains("on")) showMenu(); },
+          });
+          return;
+        }
+        launch(which);
       }
 
-      document.querySelectorAll("[data-start]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          unlockAudio();
-          startMode(btn.getAttribute("data-start"));
-        });
-      });
-      document.querySelectorAll("[data-help]").forEach((btn) => {
-        btn.addEventListener("click", () => openHelp(btn.getAttribute("data-help"), false));
-      });
-      $("help-btn").addEventListener("click", () => { if (mode) openHelp(mode, true); });
-      $("back-btn").addEventListener("click", showMenu);
-      $("pause-btn").addEventListener("click", () => {
-        if (!mode || frozen) return;
+      function freezeForSheet() {
         const reactionLive = mode === "reaction" && (reactState === "waiting" || reactState === "go");
         setFrozen(true);
         if (reactionLive) {
           reactEpoch += 1;
           clearReactTimer();
           paintReaction("idle", "Tap to start", "Ready");
+          statusEl.textContent = "Try reset. Tap to arm again.";
         }
+        return reactionLive;
+      }
+      function openHelp() {
+        if (!mode || frozen) return;
+        const info = DRILLS[mode];
+        freezeForSheet();
+        const resume = () => { closeSheet(); setFrozen(false); };
+        openSheet({
+          title: info.title,
+          paragraphs: [info.summary],
+          steps: info.steps,
+          primary: "Resume",
+          onPrimary: resume,
+          onDismiss: resume,
+        });
+      }
+      function openPause() {
+        if (!mode || frozen || !live) return;
+        const reactionLive = freezeForSheet();
+        const resume = () => { closeSheet(); setFrozen(false); };
         openSheet({
           title: "Paused",
           paragraphs: [
             reactionLive
-              ? "This reaction round restarts when you resume."
-              : "The board is hidden until you resume.",
+              ? "This reaction try restarts when you resume."
+              : "The board is hidden and the clock is stopped until you resume.",
           ],
           primary: "Resume",
           secondary: "Main menu",
-          onPrimary: () => { closeSheet(); setFrozen(false); },
-          onSecondary: () => { closeSheet(); setFrozen(false); showMenu(); },
+          onPrimary: resume,
+          onSecondary: () => { closeSheet(); showMenu(); },
+          onDismiss: resume,
         });
-      });
-      $("seq-retry").addEventListener("click", () => startMode("sequence"));
-      $("pat-retry").addEventListener("click", () => startMode("pattern"));
-      $("reset-btn").addEventListener("click", () => {
+      }
+
+      function openSettings() {
+        openSheet({
+          title: "Settings",
+          build: (host) => {
+            const row = (label, hint, pressed, onToggle) => {
+              const wrap = document.createElement("div");
+              wrap.className = "setting";
+              const text = document.createElement("span");
+              text.textContent = label;
+              const small = document.createElement("small");
+              small.textContent = hint;
+              text.appendChild(small);
+              const sw = document.createElement("button");
+              sw.type = "button";
+              sw.className = "switch";
+              sw.setAttribute("aria-label", label);
+              sw.setAttribute("aria-pressed", pressed ? "true" : "false");
+              sw.addEventListener("click", () => {
+                const next = sw.getAttribute("aria-pressed") !== "true";
+                sw.setAttribute("aria-pressed", next ? "true" : "false");
+                onToggle(next);
+              });
+              wrap.appendChild(text);
+              wrap.appendChild(sw);
+              host.appendChild(wrap);
+            };
+            row("Sound", "Tones for taps, hits and misses", !muted, (on) => { unlockAudio(); setMuted(!on); });
+            row("Vibration", "Short buzz on taps, where the phone supports it", haptics, (on) => {
+              haptics = on;
+              store.set("rbt-haptics", on ? "1" : "0");
+              if (on) buzz(BUZZ.good);
+            });
+            const extra = document.createElement("div");
+            extra.className = "sheet-extra";
+            const reset = document.createElement("button");
+            reset.type = "button";
+            reset.className = "btn danger";
+            reset.textContent = "Reset all bests";
+            reset.addEventListener("click", confirmReset);
+            extra.appendChild(reset);
+            host.appendChild(extra);
+          },
+          primary: "Done",
+          onPrimary: closeSheet,
+        });
+      }
+      function confirmReset() {
         openSheet({
           title: "Reset bests?",
-          paragraphs: ["Sequence, reaction and pattern records on this device will clear. This cannot be undone."],
+          paragraphs: ["Your best scores for all six drills on this device will clear. Your streak and today's gates stay. This cannot be undone."],
           primary: "Reset",
+          danger: true,
           secondary: "Cancel",
           onPrimary: () => {
-            stats = { seq: 0, react: null, pat: 0, reacts: [] };
+            stats = { seq: 0, react: null, pat: 0, reacts: [], count: null, sums: 0, colour: 0 };
             saveStats();
             closeSheet();
+            paintHome();
           },
           onSecondary: closeSheet,
         });
+      }
+
+      $("settings-btn").addEventListener("click", openSettings);
+      $("help-btn").addEventListener("click", openHelp);
+      $("pause-btn").addEventListener("click", openPause);
+      $("back-btn").addEventListener("click", showMenu);
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+          if (views.menu.classList.contains("on")) paintHome();
+          return;
+        }
+        if (mode && live && !frozen && sheet.hidden) openPause();
       });
 
       document.addEventListener("keydown", (event) => {
         if (event.repeat) return;
         if (!sheet.hidden) {
-          if (event.key === "Escape") sheetSecondaryFn();
+          if (event.key === "Escape") sheetDismissFn();
           if (event.key === "Tab") {
-            const nodes = [sheetSecondary, sheetPrimary].filter((btn) => !btn.hidden);
+            const nodes = Array.from(sheet.querySelectorAll("button")).filter((btn) => !btn.hidden);
             if (!nodes.length) return;
             const first = nodes[0];
             const last = nodes[nodes.length - 1];
@@ -1297,17 +2238,19 @@
           }
           return;
         }
-        if (event.key === "Escape" && mode) {
-          $("pause-btn").click();
-          return;
-        }
+        if (event.key === "Escape" && mode) { openPause(); return; }
         if (!mode || frozen) return;
         if (mode === "sequence" && event.key >= "1" && event.key <= "9") seqClick(Number(event.key) - 1);
         if (mode === "reaction" && (event.key === " " || event.key === "Enter") && document.activeElement !== arena) {
           event.preventDefault();
           arena.click();
         }
+        if ((mode === "sums" || mode === "colour") && event.key >= "1" && event.key <= "4" && answerFn) {
+          answerFn(Number(event.key) - 1);
+        }
       });
+
+      paintHome();
     })();
   </script>
 </body>

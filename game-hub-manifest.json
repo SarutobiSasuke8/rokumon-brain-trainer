@@ -1,21 +1,21 @@
 {
   "slug": "rokumon-brain-trainer",
   "title": "Rokumon Brain Trainer",
-  "tagline": "Sequence, reaction and pattern drills.",
-  "description": "Three short cognitive modes: sequence memory, reaction time and odd-one-out pattern. Personal bests stored locally, scores and events reported to the hub.",
+  "tagline": "Six short drills. Pass the six gates each day.",
+  "description": "Six short drills, one per gate of the Rokumon crest: sequence memory, reaction time, odd-one-out pattern, number count, quick sums and colour clash. Passing gates fills the daily crest and builds a streak. Personal bests and the streak are stored locally; scores and events are reported to the hub.",
   "status": "released",
   "visibility": "unlisted",
   "featured": false,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "releasedAt": "2026-11-10",
-  "updatedAt": "2026-11-10",
+  "updatedAt": "2026-11-12",
   "delivery": {
     "mode": "embedded",
-    "release": "1.0.0",
+    "release": "1.1.0",
     "budget": { "maxBundleBytes": 1048576, "maxFiles": 8 }
   },
   "genres": ["Puzzle", "Brain"],
-  "tags": ["memory", "sequence", "reaction", "pattern", "short-session", "mobile", "single-player"],
+  "tags": ["memory", "sequence", "reaction", "pattern", "arithmetic", "focus", "daily", "streak", "short-session", "mobile", "single-player"],
   "controls": ["mouse", "touch", "keyboard"],
   "players": { "min": 1, "max": 1 },
   "support": { "desktop": "full", "mobile": "full" },
@@ -47,7 +47,12 @@
       { "name": "sequence-completed", "properties": { "level": "number" } },
       { "name": "reaction-completed", "properties": { "ms": "number" } },
       { "name": "reaction-best", "properties": { "ms": "number" } },
-      { "name": "pattern-correct", "properties": { "round": "number" } }
+      { "name": "pattern-correct", "properties": { "round": "number" } },
+      { "name": "count-completed", "properties": { "ms": "number" } },
+      { "name": "sums-completed", "properties": { "correct": "number" } },
+      { "name": "colour-completed", "properties": { "correct": "number" } },
+      { "name": "gate-passed", "properties": { "gate": "number", "drill": "string", "today": "number" } },
+      { "name": "crest-complete", "properties": { "streak": "number" } }
     ]
   },
   "source": {
